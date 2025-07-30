@@ -18,7 +18,7 @@ public class DT_Tests
     [Theory]
     public void TestParseYearOnly(string? input, DateOnly? expected)
     {
-        var parsedDateTime = input.AsSpan().AsDtValue(true);
+        var parsedDateTime = input.AsSpan().AsDate(true);
         Assert.Equal(expected, parsedDateTime);
     }
     
@@ -29,7 +29,7 @@ public class DT_Tests
     [Theory]
     public void InvalidStringsThrow(string input)
     {
-        var ex = Record.Exception(() => { input.AsSpan().AsDtValue(); });
+        var ex = Record.Exception(() => { input.AsSpan().AsDate(); });
         Assert.NotNull(ex);
     }
 }

@@ -11,24 +11,27 @@ public class DateTimeParseBench
     
     // Again, all tests are flawed, but lets try as best we can
 
-    private const string _input = "202503"; // March 2025
+    private const string _inputDT = "202503"; // March 2025
+    private const string _inputDTM = "20250304132813.1234+0930"; // March 4th, 2025, 1:28:13 PM, with offset +9:30
     
     [Benchmark(Baseline = true)]
     public void FastHL7_ParseDTValue()
     {
-        var output = _input.AsSpan().AsDtValue(true);
+        var dt = _inputDT.AsSpan().AsDate(true);
+        var dtm = _inputDTM.AsSpan().AsDateTime();
     }
 
     [Benchmark]
     public void HL7V2_ParseDTValue()
     {
-        var dt = MessageHelper.ParseDateTime(_input);
+        var dt = MessageHelper.ParseDateTime(_inputDT);
+        var dtm = MessageHelper.ParseDateTime(_inputDTM);
     }
 
     // [Benchmark]
     // public void NHapi_ParseDTValue()
     // {
-    //     var dt = NHapi.Base.Validation.
+    //     var dt = NHapi.Base.Parser
     // }
     
 }
