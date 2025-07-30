@@ -9,6 +9,13 @@ namespace Benchmarks;
 public class DateTimeParseBench
 {
     
+    /*
+| Method               | Mean      | Error      | StdDev   | Ratio | RatioSD | Gen0   | Gen1   | Allocated | Alloc Ratio |
+|--------------------- |----------:|-----------:|---------:|------:|--------:|-------:|-------:|----------:|------------:|
+| FastHL7_ParseDTValue |  49.34 ns |   0.575 ns | 0.031 ns |  1.00 |    0.00 |      - |      - |         - |          NA |
+| HL7V2_ParseDTValue   | 861.43 ns | 135.225 ns | 7.412 ns | 17.46 |    0.13 | 0.1631 | 0.0010 |    2824 B |          NA |
+     */
+    
     // Again, all tests are flawed, but lets try as best we can
 
     private const string _inputDT = "202503"; // March 2025
