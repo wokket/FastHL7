@@ -11,7 +11,7 @@ public static class DateTimeExtensions
     /// </summary>
     /// <param name="value">The field value from a message</param>
     /// <param name="throwException">Throw, rather than swallowing exceptions...</param>
-    /// <remarks>This method does not allocate if successful.  For spec info see https://hl7-definition.caristix.com/v2/HL7v2.7/DataTypes/DT</remarks>
+    /// <remarks>This method does not allocate if successful.  For spec info see https://hl7.org.au/archive/hl7v2wg/3-Datatypes_1278276.html#id-3Datatypes-3.9DT-date</remarks>
     /// <returns></returns>
     public static DateOnly? AsDate(this ReadOnlySpan<char> value, bool throwException = true)
     {
@@ -55,12 +55,12 @@ public static class DateTimeExtensions
     /// <summary>
     /// Remember: "Anything involving dates and times is wrong.  If you think it's right you just haven't found the bug yet" - An old mentor.
     /// 
-    /// Converts a string used for a `DTM` (DateTime) value into a <see cref="DateTimeOffset"/> object.  If a value isn't provided in the message it is subsituted for either `0` or `1` in the returned object.
+    /// Converts a string used for a `TS` (Timestamp) value into a <see cref="DateTimeOffset"/> object.  If a value isn't provided in the message it is substituted for either `0` or `1` in the returned object.
     /// Ie, `2024` will return a <see cref="DateTimeOffset"/> object for midnight on 1-jan-2024.
     /// </summary>
     /// <param name="value"></param>
     /// <param name="throwException">Throw, rather than swallowing exceptions...</param>
-    /// <remarks>This method does not allocate if successful.  For spec info see https://hl7-definition.caristix.com/v2/HL7v2.7/DataTypes/DTM</remarks>
+    /// <remarks>This method does not allocate if successful.  For spec info see https://hl7.org.au/archive/hl7v2wg/3-Datatypes_1278276.html#id-3Datatypes-3.26TS-timestamp</remarks>
     /// <returns></returns>
     public static DateTimeOffset? AsDateTime(this ReadOnlySpan<char> value, bool throwException = true)
     {
@@ -76,7 +76,7 @@ public static class DateTimeExtensions
                 if (throwException)
                 {
                     throw new ArgumentOutOfRangeException(nameof(value),
-                        "Value must be between 4 and 24 characters for a DTM value.");
+                        "Value must be between 4 and 24 characters for a TS value.");
                 }
 
                 return null;
