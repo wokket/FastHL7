@@ -1,0 +1,1 @@
+Because it's easy to be fast if you're wrong.

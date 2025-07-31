@@ -8,12 +8,9 @@ namespace UnitTests;
 
 public class MessageTests
 {
-    private readonly ITestOutputHelper _output;
-
     public MessageTests(ITestOutputHelper output)
     {
-        _output = output;
-        DotMemoryUnitTestOutput.SetOutputMethod(_output.WriteLine);
+        DotMemoryUnitTestOutput.SetOutputMethod(output.WriteLine);
     }
     
     
@@ -132,5 +129,18 @@ public class MessageTests
         {
             // we're good 
         }
+    }
+
+    [Fact]
+    public void TestCustomDelimiters()
+    {
+        const string text = """
+                            MSH123451SendingApp1SendingFac2Comp21ReceivingApp1ReceivingFac111ADT2A0811P12.3
+                            EVN1A081abcdef
+                            """;
+        var hl7Message = new Message(text);
+        var sendingFac = hl7Message.GetSegment("MSH").GetField(3).GetComponent(1);
+        Assert.Equal("Comp", sendingFac);
+        
     }
 }

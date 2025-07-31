@@ -29,6 +29,12 @@ public readonly ref struct Field
     /// </summary>
     public int ComponentCount => _components?.Length ?? 0;
 
+    /// <summary>
+    /// Gets the component at the given index (0-based).
+    /// </summary>
+    /// <param name="i"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public ReadOnlySpan<char> GetComponent(int i)
     {
         if (_components.Length <= i || i < 0)

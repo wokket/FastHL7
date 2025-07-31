@@ -19,11 +19,18 @@ It provides a set of tools for your toolkit, rather than being a fully integrate
   - [x] Allow fetch of segments by name/ordinal with index (`message.GetSegment("PID(2)")`) for repeating segments
   - [ ] Allow fetch of segments by name/ordinal with index and field (`message.QueryValue("PID(2).4")`?)  We don't know whether to return a Field, Segment, Component etc, so just the `ReadOnlySpan<char>` ?.... 
 - [x] Allow fetch of fields by index (`pid.GetField(4)`)
-- [ ] Support for Components and Subcomponents (`^`, `&`)
+- [ ] Support for Components (`^`)
+- [ ] and Sub-Components (`&`)
 - [ ] Support for Repeating fields (`~`)
 - [ ] Sample of a MLLP listener that actually consumes and processes messages to prove out API 
 - [x] Low-alloc DateTime conversion helpers
 - [ ] Query by path (`message.Query("NK1(2).4.1")` or similar)
 - [ ] Support MEL.ILogger for places we swallow exceptions etc
-- [ ] Escape sequences (https://docs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls?KEY=EHL72_escape_sequences)
+
+ 
+- [x] Escape sequences for delimiter chars (https://docs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls?KEY=EHL72_escape_sequences)
+  - [x] Hex char support via Hex Encoding (0xA2) (https://web.archive.org/web/20160422163547/https://corepointhealth.com/resource-center/hl7-resources/hl7-escape-sequences)
+  - [ ] Unicode char support via Html Encoding (&#162;) (https://hl7.org.au/archive/hl7v2wg/1278287.html#Appendix1ParsingHL7v2(Informative)-8Unicodecharacters) (Leaving for the caller for now)
+
+- 
 - [ ] Support for efficiently _building_ messages (maybe)

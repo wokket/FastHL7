@@ -34,7 +34,7 @@ public class ParseMessageBench
     public void FastHl7()
     {
         var msg = new FastHl7.Message(_sampleMessage);
-        var orc = msg.GetSegment(3);
+        //var orc = msg.GetSegment(3);
         var nte = msg.GetSegment("NTE(2)");
         
         var noteText = nte.GetField(3);
@@ -55,7 +55,7 @@ public class ParseMessageBench
     {
         var msg = new Efferent.HL7.V2.Message(_sampleMessage);
         msg.ParseMessage(true);
-        var orc = msg.Segments()[3];
+        //var orc = msg.Segments()[3];
         var nte = msg.Segments("NTE")[1];
     
         var noteText = nte.Fields(3);
@@ -76,7 +76,7 @@ public class ParseMessageBench
     {
         var parser = new PipeParser();
         var msg = (parser.Parse(_sampleMessage) as ORM_O01)!; // there's normally more work involved in determining this
-        var orc = msg.ORDERs.First().ORC;
+        //var orc = msg.ORDERs.First().ORC;
         var nte = msg.ORDERs.First().ORDER_DETAIL.NTEs.ElementAt(1);
         var noteText = nte?.GetField(3);
         if (!(noteText?.GetValue(0)?.ToString()?.StartsWith("more text") ?? false))
