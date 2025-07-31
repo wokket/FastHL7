@@ -1,9 +1,22 @@
 ﻿using FastHl7;
+using JetBrains.dotMemoryUnit;
+using Xunit.Abstractions;
+
+[assembly: DotMemoryUnit(FailIfRunWithoutSupport = false)]
 
 namespace UnitTests;
 
 public class MessageTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public MessageTests(ITestOutputHelper output)
+    {
+        _output = output;
+        DotMemoryUnitTestOutput.SetOutputMethod(_output.WriteLine);
+    }
+    
+    
     [Fact]
     public void TestMessageConstruction()
     {
@@ -20,11 +33,11 @@ public class MessageTests
 
         // Assert
         Assert.Equal("MSH|^~\\&|SendingApp|SendingFac|ReceivingApp|ReceivingFac|202310101010||ADT^A01|1234567890|P|2.3",
-            mshSegment);
-        Assert.Equal("EVN|A01|202310101010", hl7Message.GetSegment(1)); // EVN segment
+            mshSegment.Value);
+        Assert.Equal("EVN|A01|202310101010", hl7Message.GetSegment(1).Value); // EVN segment
         Assert.Equal(
             "PID|1||123456^^^MRN||Doe^John||19800101|M|||123 Main St^^Anytown^CA^12345||(555)555-5555|||||||987654321",
-            hl7Message.GetSegment(2)); // PID segment
+            hl7Message.GetSegment(2).Value); // PID segment
     }
 
     [Fact]

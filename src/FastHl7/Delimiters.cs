@@ -4,10 +4,10 @@ namespace FastHl7;
 /// Helper for various delimiter characters used in a message.  The Spec allows for differing delimiters _per message_
 /// but is generally a standard set (|^~\&) 
 /// </summary>
-public struct Delimiters
+public class Delimiters
 {
     
-    public static Delimiters Default { get; } = new("MSH|^~\\&");
+    //public static Delimiters Default { get; } = new("MSH|^~\\&");
     
     public Delimiters(ReadOnlySpan<char> message)
     {

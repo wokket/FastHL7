@@ -1,4 +1,7 @@
-﻿namespace FastHl7;
+﻿using System.Runtime.CompilerServices;
+[assembly: InternalsVisibleTo("UnitTests")]
+
+namespace FastHl7;
 
 public readonly ref struct Message
 {
@@ -12,15 +15,14 @@ public readonly ref struct Message
     public Message(string message)
     {
         MessageText = message;
-        _delimiters = new(MessageText.AsSpan());
-
+        _delimiters = new(MessageText);
         _segments = SplitHelper.SplitSegments(MessageText);
     }
 
     /// <summary>
     /// The raw HL7 message content underlying this object.
     /// </summary>
-    private string MessageText { get; }
+    private ReadOnlySpan<char> MessageText { get; }
 
     /// <summary>
     /// Gets the segment at the requested 0-based index (MSH is effectively always 0)
@@ -28,14 +30,14 @@ public readonly ref struct Message
     /// <param name="i"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public ReadOnlySpan<char> GetSegment(int i)
+    public Segment GetSegment(int i)
     {
         if (_segments.Length <= i || i < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(i), "Segment index is out of range.");
         }
 
-        return MessageText.AsSpan()[_segments[i]];
+        return new(MessageText[_segments[i]], _delimiters);
     }
 
     /// <summary>
@@ -69,12 +71,12 @@ public readonly ref struct Message
         var foundCount = 0;
         foreach (var segment in _segments)
         {
-            if (!MessageText.AsSpan()[segment].StartsWith(segmentName, StringComparison.OrdinalIgnoreCase))
+            if (!MessageText[segment].StartsWith(segmentName, StringComparison.OrdinalIgnoreCase))
                 continue; // not our segment name
 
             if (foundCount + 1 == repeat) // +1 so we get 1-based indexing
             {
-                return new Segment(MessageText.AsSpan()[segment], _delimiters);
+                return new(MessageText[segment], _delimiters);
             }
 
             foundCount++;

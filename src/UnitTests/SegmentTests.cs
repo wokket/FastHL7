@@ -17,11 +17,12 @@ public class SegmentTests
         Assert.Equal("MSH", segment.Name);
         Assert.Equal("MSH|^~\\&|SendingApp|SendingFac|ReceivingApp|ReceivingFac|202310101010||ADT^A01|1234567890|P|2.3",
             segment.Value);
-        Assert.Equal("SendingApp", segment.GetField(2));
-        Assert.Equal("ReceivingFac", segment.GetField(5));
-        Assert.Equal("ADT^A01", segment.GetField(8));
-        Assert.Equal("2.3", segment.GetField(11));
+        Assert.Equal("SendingApp", segment.GetField(2).Value);
+        Assert.Equal("ReceivingFac", segment.GetField(5).Value);
+        Assert.Equal("ADT^A01", segment.GetField(8).Value);
+        Assert.Equal("2.3", segment.GetField(11).Value);
         Assert.True(segment.HasValue);
+        Assert.Equal(12, segment.FieldCount);
     }
 
     [Fact]

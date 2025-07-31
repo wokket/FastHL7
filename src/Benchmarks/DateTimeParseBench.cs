@@ -52,10 +52,10 @@ public class DateTimeParseBench
 
         var ts = MessageHelper.ParseDateTime(_inputTS);
 
-        // HL7V2 seems to lose the microsecond???
+        // HL7V2 seems to lose the microsecond???  Logged at https://github.com/Efferent-Health/HL7-V2/issues/12
         var expected = new DateTime(2025, 03, 04, 13, 28, 13, DateTimeKind.Utc).Subtract(new TimeSpan(9, 30, 0))
             .AddSeconds(0.123);
-        if (ts.Value != expected) //sanity check
+        if (ts!.Value != expected) //sanity check
         {
             throw new("Invalid TS value");
         }

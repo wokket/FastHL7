@@ -17,6 +17,7 @@ It provides a set of tools for your toolkit, rather than being a fully integrate
 - [x] Allow fetch of segments by index
 - [x] Allow fetch of segments by name/ordinal (`message.GetSegment("PID")`)
   - [x] Allow fetch of segments by name/ordinal with index (`message.GetSegment("PID(2)")`) for repeating segments
+  - [ ] Allow fetch of segments by name/ordinal with index and field (`message.QueryValue("PID(2).4")`?)  We don't know whether to return a Field, Segment, Component etc, so just the `ReadOnlySpan<char>` ?.... 
 - [x] Allow fetch of fields by index (`pid.GetField(4)`)
 - [ ] Support for Components and Subcomponents (`^`, `&`)
 - [ ] Support for Repeating fields (`~`)
