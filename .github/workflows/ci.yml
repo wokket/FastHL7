@@ -58,7 +58,7 @@ jobs:
         filename: "**/*.cobertura.xml"
         badge: true
         fail_below_min: false # just informative for now
-        format: markdown, Html_Dark
+        format: markdown
         hide_branch_rate: false
         hide_complexity: false
         indicators: true
