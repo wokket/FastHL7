@@ -22,9 +22,16 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 9.x.x
+    
     - name: Restore dependencies
-      run: dotnet restore src/FastHl7.sln
+      run: dotnet restore -f net9.0
+      workinworking-directory: src
+    
     - name: Build
-      run: dotnet build src/FastHl7.sln --no-restore
+      run: dotnet build src/FastHl7.sln --no-restore -c Release -f net9.0
+      workingworking-directory: src
+    
     - name: Test
-      run: dotnet test src/FastHl7.sln --no-build --verbosity normal
+      run: dotnet test -c Release -f net9.0 --logger GitHubActions --no-build --verbosity normal --collect:"XPlat Code Coverage"
+      workingworking-directory: src/UnitTests
+      
