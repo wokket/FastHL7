@@ -27,14 +27,14 @@ jobs:
       run: dotnet tool install -g dotnet-reportgenerator-globaltool  
       
     - name: Restore dependencies
-      run: dotnet restore FastHl7.sln -f net9.0
+      run: dotnet restore FastHl7.sln
       working-directory: src
     
     - name: Build
-      run: dotnet build --no-restore -c Release -f net9.0
+      run: dotnet build --no-restore -c Release
       working-directory: src
     
     - name: Test
-      run: dotnet test -c Release -f net9.0 --logger GitHubActions --no-build --verbosity normal --collect:"XPlat Code Coverage"
+      run: dotnet test -c Release -f --no-build --verbosity normal --collect:"XPlat Code Coverage"
       working-directory: src/UnitTests
       
