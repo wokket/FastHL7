@@ -37,7 +37,6 @@ public static class EscapeSequenceExtensions
     /// /// - `\Cxxyy\`, '\Mxxyyzz\ arguably _should_ be handled, but aren't currently.  There's [some suggestion](https://confluence.hl7australia.com/display/OOADRM20181/Appendix+1+Parsing+HL7v2#Appendix1ParsingHL7v2-Unicodecharacters) that these are discouraged in lieu of html-escaped values
     ///
     /// </summary>
-    /// <remarks>Note that this method has to allocate a new buffer for the content, so only call it if <see cref="RequiresUnescaping"/> returns true;</remarks>
     /// <param name="value"></param>
     /// <param name="delimiters"></param>
     /// <returns></returns>
@@ -47,7 +46,6 @@ public static class EscapeSequenceExtensions
 
         if (!value.RequiresUnescaping(delimiters))
         {
-            // TODO: Log that the caller should have called RequiresUnescaping first for efficiency??
             return value; // no escaping required, just return the original string
         }
 

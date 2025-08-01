@@ -8,8 +8,10 @@ These are both fantastic libraries, with different trade-offs, and I've used bot
 
 This library aims for the simplicity of HL7-V2, while being strictly modern .Net, and as lean as we can make it!  It is not intended to be the one HL7 library to rule them all!
 
-It is currently focused on _reading_ messages, not building/writing them.
-It provides a set of tools for your toolkit, rather than being a fully integrated all-in-one framework.
+It is currently focused on _reading_ messages, not building/writing them., and is mainly an exercise in self-learning to play with 
+the new hotness in modern .NET.
+
+It aims provides a set of tools for your toolkit, rather than being a fully integrated all-in-one framework.
  
 # Things to do (in no particular order)
 
@@ -22,15 +24,16 @@ It provides a set of tools for your toolkit, rather than being a fully integrate
 - [ ] Support for Components (`^`)
 - [ ] and Sub-Components (`&`)
 - [ ] Support for Repeating fields (`~`)
-- [ ] Sample of a MLLP listener that actually consumes and processes messages to prove out API 
+- Samples: 
+  - [ ] MLLP listener that actually consumes and processes messages to prove out API 
 - [x] Low-alloc DateTime conversion helpers
 - [ ] Query by path (`message.Query("NK1(2).4.1")` or similar)
 - [ ] Support MEL.ILogger for places we swallow exceptions etc
-
+- [ ] Nuget when vaguely ready
  
 - [x] Escape sequences for delimiter chars (https://docs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls?KEY=EHL72_escape_sequences)
   - [x] Hex char support via Hex Encoding (0xA2) (https://web.archive.org/web/20160422163547/https://corepointhealth.com/resource-center/hl7-resources/hl7-escape-sequences)
-  - [ ] Unicode char support via Html Encoding (&#162;) (https://hl7.org.au/archive/hl7v2wg/1278287.html#Appendix1ParsingHL7v2(Informative)-8Unicodecharacters) (Leaving for the caller for now)
+  - [ ] Unicode char support via Html Encoding (&#162;) (https://hl7.org.au/archive/hl7v2wg/1278287.html#Appendix1ParsingHL7v2(Informative)-8Unicodecharacters) 
+    - (Leaving for the caller for now, just use `WebUtility.HtmlDecode`)
 
-- 
 - [ ] Support for efficiently _building_ messages (maybe)
