@@ -22,13 +22,16 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 9.x.x
-    
+
+    - name: Install Coverage Report Generator
+      run: dotnet tool install -g dotnet-reportgenerator-globaltool  
+      
     - name: Restore dependencies
-      run: dotnet restore -f net9.0
+      run: dotnet restore FastHl7.sln -f net9.0
       working-directory: src
     
     - name: Build
-      run: dotnet build src/FastHl7.sln --no-restore -c Release -f net9.0
+      run: dotnet build --no-restore -c Release -f net9.0
       working-directory: src
     
     - name: Test
