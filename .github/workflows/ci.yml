@@ -13,7 +13,9 @@ on:
 
 jobs:
   build:
-
+    
+    # Permissions this GitHub Action needs for other things in GitHub
+    permissions: write-all
     runs-on: ubuntu-latest
 
     steps:
