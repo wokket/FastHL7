@@ -41,7 +41,7 @@ jobs:
       working-directory: src/UnitTests
       
     - name: Combine Coverage Reports # This is because one report is produced per project, and we want one result for all of them.
-      uses: danielpalme/ReportGenerator-GitHub-Action@5.2.4
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.4.11
       with:
         reports: "**/*.cobertura.xml" # REQUIRED # The coverage reports that should be parsed (separated by semicolon). Globbing is supported.
         targetdir: "${{ github.workspace }}" # REQUIRED # The directory where the generated report should be saved.
@@ -66,7 +66,7 @@ jobs:
         thresholds: "10 30"
 
     - name: Publish Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2.16.1
+      uses: EnricoMi/publish-unit-test-result-action@v2.20.0
       if: always()
       with:
         trx_files: "${{ github.workspace }}/**/*.trx"
