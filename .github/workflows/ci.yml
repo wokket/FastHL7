@@ -25,13 +25,13 @@ jobs:
     
     - name: Restore dependencies
       run: dotnet restore -f net9.0
-      workinworking-directory: src
+      working-directory: src
     
     - name: Build
       run: dotnet build src/FastHl7.sln --no-restore -c Release -f net9.0
-      workingworking-directory: src
+      working-directory: src
     
     - name: Test
       run: dotnet test -c Release -f net9.0 --logger GitHubActions --no-build --verbosity normal --collect:"XPlat Code Coverage"
-      workingworking-directory: src/UnitTests
+      working-directory: src/UnitTests
       
