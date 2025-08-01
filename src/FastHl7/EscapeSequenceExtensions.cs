@@ -33,7 +33,7 @@ public static class EscapeSequenceExtensions
     /// - `\N\` Indicates the end of highlighted text and resumption of normal text.  This is a consuming application problem and will not be replaced.
     /// - `\Z...\` Custom application escape sequences, these are custom (as are most `Z` items in HL7) and will not be replaced.
     ///
-    /// Also, not all of the sequences that _should_ be replaced are currently being handled, specifically:
+    /// Also, not all the sequences that _should_ be replaced are currently being handled, specifically:
     /// /// - `\Cxxyy\`, '\Mxxyyzz\ arguably _should_ be handled, but aren't currently.  There's [some suggestion](https://confluence.hl7australia.com/display/OOADRM20181/Appendix+1+Parsing+HL7v2#Appendix1ParsingHL7v2-Unicodecharacters) that these are discouraged in lieu of html-escaped values
     ///
     /// </summary>
@@ -98,8 +98,8 @@ public static class EscapeSequenceExtensions
                 case "E": // escape character
                     sb.Append(delimiters.EscapeCharacter);
                     break;
-                case ".br": // TODO: Real?
-                    sb.Append("<BR>");
+                case ".br": // In the spec, let the runtime decide \r or \n or whathaveyou
+                    sb.Append(Environment.NewLine);
                     break;
 
                 default:
@@ -126,8 +126,7 @@ public static class EscapeSequenceExtensions
             buffer = buffer[(sequenceEndIndex + 1)..]; // move past the end of the sequence
         }
 
-        return
-            sb.ToString(); // TODO: IS there any way we can do this without allocating a new string?  Accept a buffer in as an overload ??
+        return sb.ToString(); // TODO: IS there any way we can do this without allocating a new string?  Accept a buffer in as an overload ??
     }
 
 

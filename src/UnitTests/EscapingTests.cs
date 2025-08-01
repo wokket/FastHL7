@@ -27,10 +27,10 @@ public class EscapingTests
     [InlineData(@"\ZCustomSequence\ Is Ignored", @"\ZCustomSequence\ Is Ignored")] // custom application escape sequence, not replaced
     [InlineData(@"This is \H\highlighted text\N\ and this isn't", @"This is \H\highlighted text\N\ and this isn't")] // highlighted text is a consuming application problem, so we don't replace it
     [InlineData(@"10\S\9/l", "10^9/l")]
-    [InlineData(@"Cost 99\T\#162;", "Cost 99¢")]
     [InlineData(@"Trailing \E\", @"Trailing \")]
     [InlineData(@"\F\ Leading", @"| Leading")]
     [InlineData(@"T\XC3A4\glich 1 Tablette oral einnehmen\E\day \H\ONLY\N\ if tests > 10\S\9/l. ", @"Täglich 1 Tablette oral einnehmen\day \H\ONLY\N\ if tests > 10^9/l. ")]
+    [InlineData(@"Cost 99\T\#162;", "Cost 99¢")] // Embedded Html Encoded char
     [Theory]
     public void TestDeEscapingDefaultDelims(string input, string expected)
     {
@@ -44,6 +44,19 @@ public class EscapingTests
         result = WebUtility.HtmlDecode(result.ToString()); // not going to be part of this library, but demonstrating what a caller could do if they have embedded Html encoded chars
         // Assert
         Assert.Equal(expected, result);
+    }
+    
+    [Fact]
+    public void TestDeEscapingMultilinesCustomDelims()
+    {
+        // Arrange
+        var delimiters = new Delimiters("MSH|^~G&|SendingApp|SendingFac|ReceivingApp|ReceivingFac|202310101010||ADT^A01|1234567890|P|2.3");
+
+        // Act
+        var result = "MultiG.brGLine".AsSpan().Unescape(delimiters);
+        
+        // Assert
+        Assert.Equal($"Multi{Environment.NewLine}Line", result);
     }
 
     [InlineData("C3A4", "ä")]
