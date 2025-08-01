@@ -11,23 +11,29 @@ This library aims for the simplicity of HL7-V2, while being strictly modern .Net
 It is currently focused on _reading_ messages, not building/writing them., and is mainly an exercise in self-learning to play with 
 the new hotness in modern .NET.
 
-It aims provides a set of tools for your toolkit, rather than being a fully integrated all-in-one framework.
+It aims provides a set of tools for your toolkit, rather than being a fully integrated all-in-one framework, and rewards sparse access
+to the message structure.  If you need _every single field_ in the message, one of the other libraries may be a better fit, or maybe not.
  
 # Things to do (in no particular order)
 
 - [x] Create a message
-- [x] Allow fetch of segments by index
-- [x] Allow fetch of segments by name/ordinal (`message.GetSegment("PID")`)
-  - [x] Allow fetch of segments by name/ordinal with index (`message.GetSegment("PID(2)")`) for repeating segments
-  - [ ] Allow fetch of segments by name/ordinal with index and field (`message.QueryValue("PID(2).4")`?)  We don't know whether to return a Field, Segment, Component etc, so just the `ReadOnlySpan<char>` ?.... 
-- [x] Allow fetch of fields by index (`pid.GetField(4)`)
 - [ ] Support for Components (`^`)
 - [ ] and Sub-Components (`&`)
 - [ ] Support for Repeating fields (`~`)
+
+- Querying (this whole space needs some cleaning up)
+  - [x] Allow fetch of segments by index
+  - [x] Allow fetch of segments by name/ordinal (`message.GetSegment("PID")`)
+    - [x] Allow fetch of segments by name/ordinal with index (`message.GetSegment("PID(2)")`) for repeating segments
+    - [ ] Allow fetch of segments by name/ordinal with index and field (`message.QueryValue("PID(2).4")`?)  We don't know whether to return a Field, Segment, Component etc, so just the `ReadOnlySpan<char>` ?....
+  - [x] Allow fetch of fields by index (`pid.GetField(4)`)
+  - [ ] Query by path (`message.Query("NK1(2).4.1")` or similar)
+
+
 - Samples: 
   - [ ] MLLP listener that actually consumes and processes messages to prove out API 
 - [x] Low-alloc DateTime conversion helpers
-- [ ] Query by path (`message.Query("NK1(2).4.1")` or similar)
+
 - [ ] Support MEL.ILogger for places we swallow exceptions etc
 - [ ] Nuget when vaguely ready
  

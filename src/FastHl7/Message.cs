@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("UnitTests")]
 [assembly: InternalsVisibleTo("Benchmarks")]
 
@@ -85,4 +86,44 @@ public readonly ref struct Message
 
         return new(); // not found, return empty segment
     }
+    
+    
+    /// <summary>
+    /// This takes a dot-delimited query, and returns the raw message text for that query.
+    /// eg, Query("MSH") will return the MSH segment text, while Query("PID(2).3.1") will return the 1st component of the third field of the 2nd PID segment.
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    public ReadOnlySpan<char> Query(ReadOnlySpan<char> query)
+    {
+        // TODO: Formalise the query syntax, and add support for repeating fields/components/sub-components when the rest of the library gets it
+        // TODO: We're a bit adhoc on 0 or 1-based indexing... sort that out
+        if (query.IsEmpty)
+        {
+            return null;
+        }
+        
+        Span<Range> queryParts = SplitHelper.Split(query, '.');
+
+        if (queryParts.Length == 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(query), "Query should have at least one part");
+        }
+        
+        // The first part of the query is the segment, possibly with a repeat index
+        
+        
+        // This is a very simple query, just return the segment text
+        // If we want to do more complex queries, we can implement that later
+        var segment = GetSegment(query[queryParts[0]]);
+        
+        if (queryParts.Length == 1 || !segment.HasValue) // just want the segment text, or we couldn't find the segment asked for
+        {
+            return segment.Value;
+        }
+        
+        // Defer to the segment for the remainder of the query
+        return segment.Query(query[queryParts[1].Start..]);
+    }
+    
 }
