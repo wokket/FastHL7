@@ -5,7 +5,9 @@ name: .NET
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - '*'
+
   pull_request:
     branches: [ "main" ]
 
@@ -21,7 +23,7 @@ jobs:
       with:
         dotnet-version: 9.x.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore src/FastHl7.sln
     - name: Build
       run: dotnet build src/FastHl7.sln --no-restore
     - name: Test
