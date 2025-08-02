@@ -55,19 +55,15 @@ public readonly ref struct Message
         var repeat = 1; // default to 1, so PID(1) is the same as PID
 
         var parenIndex = name.IndexOf('(');
-        if (parenIndex >= 0)
+        if (parenIndex >= 0 )
         {
-            var lastIndex = name.IndexOf(')');
-            if (lastIndex < 0 ||
-                lastIndex <= parenIndex ||
-                !int.TryParse(name.Slice(parenIndex + 1, lastIndex - parenIndex - 1), out repeat)
-               )
+            segmentName = name[..parenIndex];
+
+            if (!SplitHelper.TryGetIntBetweenParens(name, out repeat))
             {
                 throw new ArgumentOutOfRangeException(nameof(name),
                     "Invalid segment name format. Expected format is 'SEGMENT_NAME' or 'SEGMENT_NAME(index)'.");
             }
-
-            segmentName = name[..parenIndex];
         }
 
         var foundCount = 0;
@@ -111,7 +107,6 @@ public readonly ref struct Message
         }
         
         // The first part of the query is the segment, possibly with a repeat index
-        
         
         // This is a very simple query, just return the segment text
         // If we want to do more complex queries, we can implement that later

@@ -45,6 +45,20 @@ public readonly ref struct Segment
 
         return new(Value[_fields[i]], _delimiters);
     }
+    
+    public Field GetField(int index, int repeat)
+    {
+        if (_fields.Length <= index || index < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index), "Field index is out of range.");
+        }
+        
+        var fieldValue  = Value[_fields[index]];
+        
+        // TODO: Handle repeats properly (treat repeat 0 differently?? Use -1 as a signal??)
+        
+        return new(fieldValue, _delimiters);
+    }
 
     /// <summary>
     /// This takes a dot-delimited query, and returns the raw message text for that query.
@@ -64,23 +78,47 @@ public readonly ref struct Segment
             throw new ArgumentOutOfRangeException(nameof(query), "Query should have at least one part");
         }
         
+        var fieldQuery = query[queryParts[0]];
+        
         // first part has to be the field index (possibly with a repeat index??) 
-        if (query[queryParts[0]].Contains('('))
+        var repeatIndex = 0;
+        int fieldIndex;
+        var parenIndex = fieldQuery.IndexOf('('); 
+        if (parenIndex >= 0)
         {
-            throw new NotImplementedException("Repeating fields not yet supported");
+            // we have a request for a repeat.
+            if (!SplitHelper.TryGetIntBetweenParens(fieldQuery, out repeatIndex))
+            {
+                throw new ArgumentOutOfRangeException(nameof(query), "Invalid field query format. Expected format is 'FIELD_INDEX' or 'FIELD_INDEX(repeat)'.");
+            }
+            
+            if (!int.TryParse(fieldQuery[..parenIndex], out fieldIndex))
+            {
+                throw new ArgumentOutOfRangeException(nameof(query), "First part of query should be a numeric field index");
+            }
+        }
+        else // no parens, simple parse
+        {
+            if (!int.TryParse(fieldQuery, out fieldIndex))
+            {
+                throw new ArgumentOutOfRangeException(nameof(query), "First part of query should be a numeric field index");
+            }    
         }
         
-        if (! int.TryParse(query[queryParts[0]], out var fieldIndex))
-        {
-            throw new ArgumentOutOfRangeException(nameof(query), "First part of query should be a numeric field index");
-        }
-        var field = GetField(fieldIndex);
+        
+        // TODO: Is asking for repeat0 the same as not asking for a repeat at all?? Return all data for the field, or just the first(default) repeat?
+        // If just the first, how do callers know there's more to process?
+        var field = GetField(fieldIndex, repeatIndex);
 
-        return field.Value;
-        // if (queryParts.Length > 1)
-        // {
-        //     // TODO: Handle components and sub-components
-        // }
+        if (queryParts.Length > 1)
+        {
+            // Defer to the field's Query method for the rest of the query
+            return field.Query(query[queryParts[1].Start..]);
+        }
+        else
+        {
+            return field.Value;
+        }
         
         
     }

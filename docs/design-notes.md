@@ -19,3 +19,21 @@ Aiming to:
   - If you're stuck using an old unsupported version of .Net you have my condolences, but just don't take any upgrades... clearly frequent upgrades aren't your forte anyway!
 
  
+## Indexing Questions
+
+To 0-index, 1-index or both??  General Principal: mirror the spec!
+
+### Segments
+- Segments are generally indexed by name (`PID` etc) rather than numerical index.
+- Querying repeated segments (via `OBX(2)` etc) are effectively 1-indexed... if you queried `NK1(1)` you'd get the same segment as just `NK1`.
+  - This reflects the `Set Id` etc in the specs
+- TODO: Message Groups etc are a complexity I haven't thought about yet
+
+### Fields
+- Fields in a segment are 0 indexed, but the 0'th field is the segment name, so the first field of a segment is `1`.  This aligns with the sequence number of the field in the spec.
+
+- Repeats are 0 indexed, so requesting `PID.3(0)` returns the same result as `PID.3`.
+  - All fields effectively have a single (default) repeat.
+
+- Components within a repeat are 0 indexed, so requesting `PID.3.1(0)` returns the same result as `PID.3.1`.
+  - TODO: Should they be??
