@@ -11,14 +11,15 @@ namespace Benchmarks;
 [SuppressMessage("Performance", "CA1822:Mark members as static")]
 [HideColumns("BuildConfiguration", "Error", "StdDev", "RatioSD")]
 public class DateTimeParseBench
-{
-    /*
-| Method                  | Mean      | Ratio | Gen0   | Gen1   | Allocated | Alloc Ratio |
-|------------------------ |----------:|------:|-------:|-------:|----------:|------------:|
-| FastHL7_ParseDateValues |  52.17 ns |  1.00 |      - |      - |         - |          NA |
-| HL7V2_ParseDateValues   | 889.60 ns | 17.05 | 0.1631 | 0.0010 |    2824 B |          NA |
-| NHapi_ParseDateValues   |  18.11 ns |  0.35 | 0.0060 |      - |     104 B |          NA |
-     */
+{ 
+
+/*
+| Method                  | Mean      | Ratio | Gen0   | Allocated | Alloc Ratio |
+|------------------------ |----------:|------:|-------:|----------:|------------:|
+| FastHL7_ParseDateValues |  61.87 ns |  1.00 |      - |         - |          NA |
+| HL7V2_ParseDateValues   | 976.06 ns | 15.81 | 0.1793 |    2824 B |          NA |
+| NHapi_ParseDateValues   | 188.09 ns |  3.05 | 0.0489 |     768 B |          NA |
+*/
 
     // Again, all tests are flawed, but lets try as best we can
 
@@ -71,12 +72,12 @@ public class DateTimeParseBench
             throw new("Invalid DT value");
         }
 
-        // I'm not smart enough to figure out how to do this
-        // var tsField = new CommonTS(_inputDTM);
-        // var dtm = new DateTimeOffset(tsField.Year, tsField.Month, tsField.Day, tsField.Hour, tsField.Minute, tsField.Second, TimeSpan.FromMinutes(tsField.GMTOffset));
-        // if (dtm != new DateTimeOffset(2025, 03, 04, 13, 28 , 13, TimeSpan.FromHours(9).Add(TimeSpan.FromMinutes(30)))) //sanity check
-        // {
-        //     throw new Exception("Invalid date value");
-        // }
+        
+        var tsField = new CommonTS(_inputTS);
+        var dtm = new DateTimeOffset(tsField.Year, tsField.Month, tsField.Day, tsField.Hour, tsField.Minute, tsField.Second,  TimeSpan.FromMinutes(570)); // +9:30 offset, I'm not smart enough to get it from ts
+        if (dtm != new DateTimeOffset(2025, 03, 04, 13, 28 , 13, TimeSpan.FromHours(9).Add(TimeSpan.FromMinutes(30)))) //sanity check
+        {
+            throw new("Invalid date value");
+        }
     }
 }
