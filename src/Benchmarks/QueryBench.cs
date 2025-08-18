@@ -8,14 +8,14 @@ namespace Benchmarks;
 public class QueryBench
 {
 /*
-| Method                    | Mean       | Ratio | Gen0   | Allocated | Alloc Ratio |
-|-------------------------- |-----------:|------:|-------:|----------:|------------:|
-| FastHl7_ConstructOnly     | 3,893.8 ns |  1.00 | 0.0076 |     208 B |        1.00 |
-| FastHl7_ConstructAndQuery | 4,184.0 ns |  1.07 | 0.0229 |     448 B |        2.15 |
-| Hl7V2_QueryOnly           |   797.1 ns |  0.20 | 0.1059 |    1664 B |        8.00 |
+| Method                    | Mean     | Ratio | Gen0   | Allocated | Alloc Ratio |
+|-------------------------- |---------:|------:|-------:|----------:|------------:|
+| FastHl7_ConstructOnly     | 3.999 us |  1.00 | 0.0076 |     176 B |        1.00 |
+| FastHl7_ConstructAndQuery | 4.808 us |  1.20 | 0.0610 |    1000 B |        5.68 |
+| Hl7V2_QueryOnly           | 2.442 us |  0.61 | 0.3052 |    4824 B |       27.41 |
 
-Real cost of FastHL7 Query in this case is 291ns/240b
- */
+Real cost of FastHL7 Query in this case is 0.809us/824b
+*/
 
 
     private static readonly Efferent.HL7.V2.Message _hl7V2Message = new(_message);
@@ -28,7 +28,7 @@ Real cost of FastHL7 Query in this case is 291ns/240b
     [Benchmark(Baseline = true)]
     public void FastHl7_ConstructOnly()
     {
-        var msg = new FastHl7.Message(_message);
+        _ = new FastHl7.Message(_message);
     }
 
     [Benchmark]

@@ -32,6 +32,7 @@ public readonly ref struct Segment
 
     /// <summary>
     /// Gets the field at the given index.  Index 0 is always the Segment name (eg MSH).
+    /// If this field has multiple repeats, _all_ the repeats are in the returned field.
     /// </summary>
     /// <param name="i"></param>
     /// <returns></returns>
@@ -47,7 +48,8 @@ public readonly ref struct Segment
     }
 
     /// <summary>
-    /// 
+    /// Gets the field at the given index.  Index 0 is always the Segment name (eg MSH).
+    /// The returned field _only_ contains the information from the requested repeat(1-i based index), and no others.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="repeat">1-based index</param>
@@ -66,8 +68,10 @@ public readonly ref struct Segment
         }
 
         var fieldValue = Value[_fields[index]];
-        var repeats = SplitHelper.Split(fieldValue, _delimiters.RepeatDelimiter);
-        if (repeat > repeats.Length)
+
+        Span<Range> repeats = stackalloc Range[20]; 
+        var repeatCount = SplitHelper.Split(fieldValue, _delimiters.RepeatDelimiter, repeats);
+        if (repeat > repeatCount)
         {
             throw new ArgumentOutOfRangeException(nameof(repeat), "Asked for repeat field doesn't have");
         }
@@ -79,7 +83,7 @@ public readonly ref struct Segment
 
     /// <summary>
     /// This takes a dot-delimited query, and returns the raw message text for that query.
-    /// eg "0" returns the content of the segment name, while "2.3" returns the content of the fourth component of the 2nd real field in the segment.
+    /// eg "0" returns the content of the segment name, while "2.3" returns the content of the third component of the 2nd real field in the segment.
     /// </summary>
     public ReadOnlySpan<char> Query(ReadOnlySpan<char> query)
     {

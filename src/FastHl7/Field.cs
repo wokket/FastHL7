@@ -7,15 +7,15 @@ namespace FastHl7;
 public readonly ref struct Field
 {
     private readonly Delimiters _delimiters;
-    private readonly Range[] _repeats;
-    private readonly Range[] _repeat0Components;
+    //private readonly Range[] _repeats;
+    //private readonly Range[] _repeat0Components;
 
     public Field(ReadOnlySpan<char> value, Delimiters delimiters)
     {
         Value = value;
         _delimiters = delimiters;
-        _repeats = SplitHelper.Split(value, _delimiters.RepeatDelimiter);
-        _repeat0Components = SplitHelper.Split(value[_repeats[0]], _delimiters.ComponentDelimiter);
+        // _repeats = SplitHelper.Split(value, _delimiters.RepeatDelimiter);
+        // _repeat0Components = SplitHelper.Split(value[_repeats[0]], _delimiters.ComponentDelimiter);
     }
 
     /// <summary>
@@ -32,29 +32,32 @@ public readonly ref struct Field
     /// <summary>
     /// Whether this field has multiple repeats
     /// </summary>
-    public bool HasRepeats => _repeats.Length > 1;
+    public bool HasRepeats
+    {
+        get { return Value.Contains(_delimiters.RepeatDelimiter); }
+    }
 
     /// <summary>
     /// Gets the number of (possibly empty) components in this field (first/only repeat). Subsequent repeats are not counted.
     /// </summary>
-    public int ComponentCount => _repeat0Components?.Length ?? 0;
+    //public int ComponentCount => _repeat0Components?.Length ?? 0;
 
 
     /// <summary>
-    /// Gets the component (in the first/only repeat) at the given index (0-based).
+    /// Gets the component (in the first/only repeat) at the given index (1-based).
     /// </summary>
     /// <param name="i"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public ReadOnlySpan<char> GetComponent(int i)
-    {
-        if (_repeat0Components.Length <= i || i < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(i), "Component index is out of range.");
-        }
-
-        return Value[_repeat0Components[i]];
-    }
+    // public ReadOnlySpan<char> GetComponent(int i)
+    // {
+    //     if (_repeat0Components.Length < i || i < 1)
+    //     {
+    //         throw new ArgumentOutOfRangeException(nameof(i), "Component index is out of range.");
+    //     }
+    //
+    //     return Value[_repeat0Components[i - 1]];
+    // }
 
 
     /// <summary>
@@ -67,6 +70,8 @@ public readonly ref struct Field
     {
         // we're expecting query to be in the format : 
         //"componentIndex[.sub-component]"
+        
+        //if this field has multiple repeats, and you query for things out of range, life might get weird....
 
         if (query.IsEmpty)
         {
@@ -86,13 +91,23 @@ public readonly ref struct Field
             throw new ArgumentOutOfRangeException(nameof(query), "Unable to parse componentIndex");
         }
 
-        var valueToReturn = Value[_repeat0Components[componentIndex - 1]]; // -1 for 1-based indexing like Hl7V2
+        var valueToQuery = Value;
+        if (Value.Contains(_delimiters.RepeatDelimiter)) // Field has multiple repeats but user didn't query a specific one - default to first repeat
+        {
+            valueToQuery = valueToQuery[..valueToQuery.IndexOf(_delimiters.RepeatDelimiter)];
+        }
+
+        Span<Range> components = stackalloc Range[10];
+        var componentCount = SplitHelper.Split(valueToQuery, _delimiters.ComponentDelimiter, components);
+        
+
+        var valueToReturn = Value[components[componentIndex - 1]]; // -1 for 1-based indexing like Hl7V2
 
         if (queryPartsCount == 1)
         {
             return valueToReturn; // nothing else to do
         }
-        
+
         // we have a subcomponent
         if (!int.TryParse(query[queryParts[1]], out var subComponentIndex))
         {
@@ -108,7 +123,7 @@ public readonly ref struct Field
         }
 
         valueToReturn = valueToReturn[subComps[subComponentIndex - 1]];
-        
+
         return valueToReturn;
     }
 }
