@@ -36,9 +36,11 @@ public class QueryTests
     [InlineData("OBX(9).5", "13.7")]
     [InlineData("OBX(14).16", "12^XYZ LAB")] // whole field value
     [InlineData("PV1.9", "01055^PHYSICIAN^RUTH^K~02807^PHYSICIAN^ERIC^LEE~07019^GI^ASSOCIATES~01255^PHYSICIAN^ADAM^I~02084^PHYSICIAN^SAYED~01116^PHYSICIAN^NURUDEEN^A~01434^PHYSICIAN^DONNA^K~02991^PHYSICIAN^NICOLE")] // first component of field value
-    [InlineData("PV1.9(2)", "07019^GI^ASSOCIATES")] 
-    [InlineData("PV1.9(2).2", "GI")] 
+    [InlineData("PV1.9(2)", "02807^PHYSICIAN^ERIC^LEE")] 
+    [InlineData("PV1.9(2).2", "PHYSICIAN")] 
     [InlineData("OBX(14).16.2", "XYZ LAB")] // second component of field value
+    [InlineData("PID.3.4" , "MIE&1.2.840.114398.1.100&ISO")]
+    [InlineData("PID.3.4.3" , "ISO")] // subcomponent
     [Theory]
     public void TestMessageQuery(string input, string expected)
     {
@@ -46,6 +48,46 @@ public class QueryTests
         var actual = message.Query(input.AsSpan());
         
         Assert.Equal(expected, actual);
+    }
+
+
+    private readonly Efferent.HL7.V2.Message _hlzV2Message = new (_message);
+
+    public QueryTests()
+    {
+        _hlzV2Message.ParseMessage(true);
+    }
+    
+    
+    // Hl7V2 doesn't support these queries, so no back compat issues
+    //[InlineData("MSH", "MSH|^~\\&|SendingApp|SendingFac|ReceivingApp|ReceivingFac|20120411070545||ORU^R01|59689|P|2.3")]
+    //[InlineData("OBX", "OBX|1|NM|wbc^Wbc^Local^6690-2^Wbc^LN||7.0|/nl|3.8-11.0||||F|||20120410160227|lab|12^XYZ LAB|")]
+    //[InlineData("OBX(8)", "OBX|8|NM|rbc^Rbc^Local^789-8^Rbc^LN||4.02|/pl|4.07-4.92|L|||F|||20120410160227|lab|12^XYZ LAB|")]
+    
+    [InlineData("PID.2", "12345")]
+    [InlineData("OBX(9).5", "13.7")]
+    [InlineData("OBX(14).16", "12^XYZ LAB")] // whole field value
+    
+    // This one is failing - Hl7V2 quietly ignores the fact the field has repeats, and just gives you the first one...
+    // We give you all the repeats, and trust that you'll realise something is up and fix your code...
+    //[InlineData("PV1.9", "01055^PHYSICIAN^RUTH^K~02807^PHYSICIAN^ERIC^LEE~07019^GI^ASSOCIATES~01255^PHYSICIAN^ADAM^I~02084^PHYSICIAN^SAYED~01116^PHYSICIAN^NURUDEEN^A~01434^PHYSICIAN^DONNA^K~02991^PHYSICIAN^NICOLE")] // first component of field value
+    
+    [InlineData("PV1.9(2)", "02807^PHYSICIAN^ERIC^LEE")] 
+    [InlineData("PV1.9(2).2", "PHYSICIAN")] 
+    [InlineData("OBX(14).16.2", "XYZ LAB")] // second component of field value
+    [InlineData("PID.3.4" , "MIE&1.2.840.114398.1.100&ISO")]
+    [InlineData("PID.3.4.3" , "ISO")] // subcomponent
+    [Theory]
+    public void TestHl7V2BackCompat(string query, string _)
+    {
+        var msg = new Message(_message);
+
+        var expected = _hlzV2Message.GetValue(query);
+        var actual = msg.Query(query);
+        
+        Assert.Equal(expected, actual);
+
+
     }
 
 

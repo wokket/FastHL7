@@ -99,12 +99,14 @@ public readonly ref struct Message
             return null;
         }
         
-        Span<Range> queryParts = SplitHelper.Split(query, '.');
+        Span<Range> queryParts = stackalloc Range[10];
+        var queryPartsCount = SplitHelper.Split(query, '.', queryParts);
 
-        if (queryParts.Length == 0)
+        if (queryPartsCount == 0)
         {
             throw new ArgumentOutOfRangeException(nameof(query), "Query should have at least one part");
         }
+
         
         // The first part of the query is the segment, possibly with a repeat index
         
@@ -112,7 +114,7 @@ public readonly ref struct Message
         // If we want to do more complex queries, we can implement that later
         var segment = GetSegment(query[queryParts[0]]);
         
-        if (queryParts.Length == 1 || !segment.HasValue) // just want the segment text, or we couldn't find the segment asked for
+        if (queryPartsCount == 1 || !segment.HasValue) // just want the segment text, or we couldn't find the segment asked for
         {
             return segment.Value;
         }

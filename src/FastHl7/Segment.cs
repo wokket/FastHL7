@@ -24,7 +24,7 @@ public readonly ref struct Segment
     /// Gets the raw text content of this segment.
     /// </summary>
     public ReadOnlySpan<char> Value { get; }
-    
+
     /// <summary>
     /// Gets the number of (possibly empty) fields in this segment
     /// </summary>
@@ -45,7 +45,14 @@ public readonly ref struct Segment
 
         return new(Value[_fields[i]], _delimiters);
     }
-    
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="repeat">1-based index</param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public Field GetField(int index, int repeat)
     {
         if (_fields.Length <= index || index < 0)
@@ -53,20 +60,20 @@ public readonly ref struct Segment
             throw new ArgumentOutOfRangeException(nameof(index), "Field index is out of range.");
         }
 
-        if (repeat < 0)
+        if (repeat <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(repeat), "Repeat must be positive");
         }
-        
-        var fieldValue  = Value[_fields[index]];
+
+        var fieldValue = Value[_fields[index]];
         var repeats = SplitHelper.Split(fieldValue, _delimiters.RepeatDelimiter);
         if (repeat > repeats.Length)
         {
             throw new ArgumentOutOfRangeException(nameof(repeat), "Asked for repeat field doesn't have");
         }
 
-        fieldValue = fieldValue[repeats[repeat]];
-        
+        fieldValue = fieldValue[repeats[repeat-1]];
+
         return new(fieldValue, _delimiters);
     }
 
@@ -80,28 +87,31 @@ public readonly ref struct Segment
         {
             return null;
         }
-        
-        Span<Range> queryParts = SplitHelper.Split(query, '.');
 
-        if (queryParts.Length == 0)
+
+        Span<Range> queryParts = stackalloc Range[10];
+        var queryPartsCount = SplitHelper.Split(query, '.', queryParts);
+
+        if (queryPartsCount == 0)
         {
             throw new ArgumentOutOfRangeException(nameof(query), "Query should have at least one part");
         }
-        
+
         var fieldQuery = query[queryParts[0]];
-        
+
         // first part has to be the field index (possibly with a repeat index??) 
         var repeatIndex = -1;
         int fieldIndex;
-        var parenIndex = fieldQuery.IndexOf('('); 
+        var parenIndex = fieldQuery.IndexOf('(');
         if (parenIndex >= 0)
         {
             // we have a request for a repeat.
             if (!SplitHelper.TryGetIntBetweenParens(fieldQuery, out repeatIndex))
             {
-                throw new ArgumentOutOfRangeException(nameof(query), "Invalid field query format. Expected format is 'FIELD_INDEX' or 'FIELD_INDEX(repeat)'.");
+                throw new ArgumentOutOfRangeException(nameof(query),
+                    "Invalid field query format. Expected format is 'FIELD_INDEX' or 'FIELD_INDEX(repeat)'.");
             }
-            
+
             if (!int.TryParse(fieldQuery[..parenIndex], out fieldIndex))
             {
                 throw new ArgumentOutOfRangeException(nameof(query), "First part of query should be a numeric field index");
@@ -112,15 +122,16 @@ public readonly ref struct Segment
             if (!int.TryParse(fieldQuery, out fieldIndex))
             {
                 throw new ArgumentOutOfRangeException(nameof(query), "First part of query should be a numeric field index");
-            }    
+            }
         }
-        
-        // If requested a repeat youjust get that.  If you asked for the whole field, well there ya go
-        var field = repeatIndex >= 0 ? GetField(fieldIndex, repeatIndex) : GetField(fieldIndex);
 
-        return queryParts.Length > 1 ?
+        // If requested a repeat you just get that.  If you asked for the whole field, well there ya go
+        var field = repeatIndex > 0 ? GetField(fieldIndex, repeatIndex) : GetField(fieldIndex);
+
+        return queryPartsCount > 1
+            ?
             // Defer to the field's Query method for the rest of the query
-            field.Query(query[queryParts[1].Start..]) : 
-            field.Value;
+            field.Query(query[queryParts[1].Start..])
+            : field.Value;
     }
 }

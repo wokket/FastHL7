@@ -73,9 +73,10 @@ public readonly ref struct Field
             return null;
         }
 
-        Span<Range> queryParts = SplitHelper.Split(query, '.');
+        Span<Range> queryParts = stackalloc Range[10];
+        var queryPartsCount = SplitHelper.Split(query, '.', queryParts);
 
-        if (queryParts.Length == 0)
+        if (queryPartsCount == 0)
         {
             throw new ArgumentOutOfRangeException(nameof(query), "Query should have at least one part");
         }
@@ -85,9 +86,29 @@ public readonly ref struct Field
             throw new ArgumentOutOfRangeException(nameof(query), "Unable to parse componentIndex");
         }
 
-        var valueToReturn = Value[_repeat0Components[componentIndex-1]]; // -1 for 1-based indexing like Hl7V2
+        var valueToReturn = Value[_repeat0Components[componentIndex - 1]]; // -1 for 1-based indexing like Hl7V2
 
+        if (queryPartsCount == 1)
+        {
+            return valueToReturn; // nothing else to do
+        }
+        
+        // we have a subcomponent
+        if (!int.TryParse(query[queryParts[1]], out var subComponentIndex))
+        {
+            throw new ArgumentOutOfRangeException(nameof(query), "Unable to parse subComponentIndex");
+        }
+
+        Span<Range> subComps = stackalloc Range[10];
+        var subCompCount = SplitHelper.Split(valueToReturn, _delimiters.SubComponentDelimiter, subComps);
+
+        if (subCompCount < subComponentIndex)
+        {
+            throw new ArgumentOutOfRangeException(nameof(query), "Requested subcomponent not found in component");
+        }
+
+        valueToReturn = valueToReturn[subComps[subComponentIndex - 1]];
+        
         return valueToReturn;
-
     }
 }

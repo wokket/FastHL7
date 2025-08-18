@@ -20,8 +20,20 @@ internal static class SplitHelper
     public static Range[] Split(ReadOnlySpan<char> value, char delimitersFieldDelimiter)
     {
         Span<Range> dest = stackalloc Range[1024];
-        var itemCount = value.Split(dest, delimitersFieldDelimiter); // don't strip empty entries, we need the blanks for indexing
-        return dest[..itemCount].ToArray(); //TODO: Can we do this any better?
+        var itemCount = Split(value, delimitersFieldDelimiter, dest); // don't strip empty entries, we need the blanks for indexing
+        return dest[..itemCount].ToArray();
+    }
+    
+    /// <summary>
+    /// Splits by delim into the dest, returning the item count in play
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="delimitersFieldDelimiter"></param>
+    /// <param name="dest"></param>
+    /// <returns></returns>
+    public static int Split(ReadOnlySpan<char> value, char delimitersFieldDelimiter, Span<Range> dest)
+    {
+        return value.Split(dest, delimitersFieldDelimiter); // don't strip empty entries, we need the blanks for indexing
     }
 
     /// <summary>

@@ -32,8 +32,7 @@ To 0-index, 1-index or both??  General Principal: mirror the spec!
 ### Fields
 - Fields in a segment are 0 indexed, but the 0'th field is the segment name, so the first field of a segment is `1`.  This aligns with the sequence number of the field in the spec.
 
-- Repeats are 0 indexed, so requesting `PID.3(0)` returns the same result as `PID.3`.
-  - All fields effectively have a single (default) repeat.
+- Repeats are 1-indexed, for back-compat with Hl7V2
 
 - Components within a repeat are 1 indexed for back-compat with Hl7V2
   - TODO: Should they be??

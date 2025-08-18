@@ -7,15 +7,17 @@ namespace Benchmarks;
 [HideColumns("BuildConfiguration", "Error", "StdDev", "RatioSD")]
 public class QueryBench
 {
-    
 /*
-| Method  | Mean       | Ratio | Gen0   | Allocated | Alloc Ratio |
-|-------- |-----------:|------:|-------:|----------:|------------:|
-| FastHl7 | 4,389.5 ns |  1.00 | 0.0305 |     568 B |        1.00 |
-| Hl7V2   |   800.9 ns |  0.18 | 0.1059 |    1664 B |        2.93 |
+| Method                    | Mean       | Ratio | Gen0   | Allocated | Alloc Ratio |
+|-------------------------- |-----------:|------:|-------:|----------:|------------:|
+| FastHl7_ConstructOnly     | 3,893.8 ns |  1.00 | 0.0076 |     208 B |        1.00 |
+| FastHl7_ConstructAndQuery | 4,184.0 ns |  1.07 | 0.0229 |     448 B |        2.15 |
+| Hl7V2_QueryOnly           |   797.1 ns |  0.20 | 0.1059 |    1664 B |        8.00 |
+
+Real cost of FastHL7 Query in this case is 291ns/240b
  */
-    
-    
+
+
     private static readonly Efferent.HL7.V2.Message _hl7V2Message = new(_message);
 
     static QueryBench()
@@ -24,30 +26,61 @@ public class QueryBench
     }
 
     [Benchmark(Baseline = true)]
-    public void FastHl7()
+    public void FastHl7_ConstructOnly()
     {
-        // we'll give HL7V2 a headstart by building our ref struct inside the benchmark, not pre-loading it!
         var msg = new FastHl7.Message(_message);
+    }
+
+    [Benchmark]
+    public void FastHl7_ConstructAndQuery()
+    {
+        // The time/mem difference between this and the baseline is the actual `Query` Cost 
+        var msg = new FastHl7.Message(_message);
+        
         var result = msg.Query("OBX(14).16.2");
         if (result is not "XYZ LAB")
         {
             throw new();
         }
-    }
 
-    [Benchmark]
-    public void Hl7V2()
-    {
-        var result = _hl7V2Message.GetValue("OBX(14).16.2");
-        if (result is not "XYZ LAB")
+        result = msg.Query("PV1.9(3)");
+        if (result is not "07019^GI^ASSOCIATES")
+        {
+            throw new();
+        }
+
+        result = msg.Query("PID.3.4.3");
+        if (result is not "ISO")
         {
             throw new();
         }
     }
-    
-    
-    
-        private const string _message =
+
+
+    [Benchmark]
+    public void Hl7V2_QueryOnly()
+    {
+        var result = _hl7V2Message.GetValue("PV1.9(3)");
+        if (result is not "07019^GI^ASSOCIATES")
+        {
+            throw new();
+        }
+
+        result = _hl7V2Message.GetValue("OBX(14).16.2");
+        if (result is not "XYZ LAB")
+        {
+            throw new();
+        }
+
+        result = _hl7V2Message.GetValue("PID.3.4.3");
+        if (result is not "ISO")
+        {
+            throw new();
+        }
+    }
+
+
+    private const string _message =
         """
         MSH|^~\&|SendingApp|SendingFac|ReceivingApp|ReceivingFac|20120411070545||ORU^R01|59689|P|2.3
         PID|1|12345|12345^^^MIE&1.2.840.114398.1.100&ISO^MR||MOUSE^MINNIE^S||19240101|F|||123 MOUSEHOLE LN^^FORT WAYNE^IN^46808|||||||||||||||||||
@@ -69,5 +102,4 @@ public class QueryBench
         OBX|13|NM|mchc^Mchc||32|g/dl|32-35||||F|||20120410160227|lab|12^XYZ LAB|
         OBX|14|NM|plt^Platelets||221|/nl|140-400||||F|||20120410160227|lab|12^XYZ LAB|
         """;
-
 }
