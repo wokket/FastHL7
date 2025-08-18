@@ -85,7 +85,7 @@ public readonly ref struct Field
             throw new ArgumentOutOfRangeException(nameof(query), "Unable to parse componentIndex");
         }
 
-        var valueToReturn = Value[_repeat0Components[componentIndex]];
+        var valueToReturn = Value[_repeat0Components[componentIndex-1]]; // -1 for 1-based indexing like Hl7V2
 
         return valueToReturn;
 
