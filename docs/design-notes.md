@@ -35,5 +35,5 @@ To 0-index, 1-index or both??  General Principal: mirror the spec!
 - Repeats are 0 indexed, so requesting `PID.3(0)` returns the same result as `PID.3`.
   - All fields effectively have a single (default) repeat.
 
-- Components within a repeat are 0 indexed, so requesting `PID.3.1(0)` returns the same result as `PID.3.1`.
+- Components within a repeat are 0 indexed
   - TODO: Should they be??

@@ -1,6 +1,5 @@
 namespace FastHl7;
 
-
 /// <summary>
 /// Fields can contain repeats, components, and sub-components.
 /// See [the spec](http://www.hl7.eu/HL7v2x/v251/std251/ch02.html#Heading13) for more info
@@ -39,7 +38,7 @@ public readonly ref struct Field
     /// Gets the number of (possibly empty) components in this field (first/only repeat). Subsequent repeats are not counted.
     /// </summary>
     public int ComponentCount => _repeat0Components?.Length ?? 0;
-    
+
 
     /// <summary>
     /// Gets the component (in the first/only repeat) at the given index (0-based).
@@ -58,8 +57,37 @@ public readonly ref struct Field
     }
 
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     public ReadOnlySpan<char> Query(ReadOnlySpan<char> query)
     {
-        throw new NotImplementedException();
+        // we're expecting query to be in the format : 
+        //"componentIndex[.sub-component]"
+
+        if (query.IsEmpty)
+        {
+            return null;
+        }
+
+        Span<Range> queryParts = SplitHelper.Split(query, '.');
+
+        if (queryParts.Length == 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(query), "Query should have at least one part");
+        }
+
+        if (!int.TryParse(query[queryParts[0]], out var componentIndex))
+        {
+            throw new ArgumentOutOfRangeException(nameof(query), "Unable to parse componentIndex");
+        }
+
+        var valueToReturn = Value[_repeat0Components[componentIndex]];
+
+        return valueToReturn;
+
     }
 }

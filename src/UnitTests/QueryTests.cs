@@ -36,8 +36,9 @@ public class QueryTests
     [InlineData("OBX(9).5", "13.7")]
     [InlineData("OBX(14).16", "12^XYZ LAB")] // whole field value
     [InlineData("PV1.9", "01055^PHYSICIAN^RUTH^K~02807^PHYSICIAN^ERIC^LEE~07019^GI^ASSOCIATES~01255^PHYSICIAN^ADAM^I~02084^PHYSICIAN^SAYED~01116^PHYSICIAN^NURUDEEN^A~01434^PHYSICIAN^DONNA^K~02991^PHYSICIAN^NICOLE")] // first component of field value
-    //[InlineData("PV1.9(2)", "07019^GI^ASSOCIATES")] 
-    //[InlineData("OBX(14).16.1", "12")] // first component of field value
+    [InlineData("PV1.9(2)", "07019^GI^ASSOCIATES")] 
+    [InlineData("PV1.9(2).1", "GI")] 
+    [InlineData("OBX(14).16.1", "XYZ LAB")] // second component of field value
     [Theory]
     public void TestMessageQuery(string input, string expected)
     {

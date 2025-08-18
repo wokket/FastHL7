@@ -52,10 +52,20 @@ public readonly ref struct Segment
         {
             throw new ArgumentOutOfRangeException(nameof(index), "Field index is out of range.");
         }
+
+        if (repeat < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(repeat), "Repeat must be positive");
+        }
         
         var fieldValue  = Value[_fields[index]];
-        
-        // TODO: Handle repeats properly (treat repeat 0 differently?? Use -1 as a signal??)
+        var repeats = SplitHelper.Split(fieldValue, _delimiters.RepeatDelimiter);
+        if (repeat > repeats.Length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(repeat), "Asked for repeat field doesn't have");
+        }
+
+        fieldValue = fieldValue[repeats[repeat]];
         
         return new(fieldValue, _delimiters);
     }
@@ -81,7 +91,7 @@ public readonly ref struct Segment
         var fieldQuery = query[queryParts[0]];
         
         // first part has to be the field index (possibly with a repeat index??) 
-        var repeatIndex = 0;
+        var repeatIndex = -1;
         int fieldIndex;
         var parenIndex = fieldQuery.IndexOf('('); 
         if (parenIndex >= 0)
@@ -105,21 +115,12 @@ public readonly ref struct Segment
             }    
         }
         
-        
-        // TODO: Is asking for repeat0 the same as not asking for a repeat at all?? Return all data for the field, or just the first(default) repeat?
-        // If just the first, how do callers know there's more to process?
-        var field = GetField(fieldIndex, repeatIndex);
+        // If requested a repeat youjust get that.  If you asked for the whole field, well there ya go
+        var field = repeatIndex >= 0 ? GetField(fieldIndex, repeatIndex) : GetField(fieldIndex);
 
-        if (queryParts.Length > 1)
-        {
+        return queryParts.Length > 1 ?
             // Defer to the field's Query method for the rest of the query
-            return field.Query(query[queryParts[1].Start..]);
-        }
-        else
-        {
-            return field.Value;
-        }
-        
-        
+            field.Query(query[queryParts[1].Start..]) : 
+            field.Value;
     }
 }
