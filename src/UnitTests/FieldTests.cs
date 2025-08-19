@@ -45,7 +45,7 @@ public class FieldTests
         Assert.True(field.HasValue);
         Assert.False(field.HasRepeats);
         Assert.Equal("00976^PHYSICIAN^DAVID^G", field.Value);
-        //Assert.Equal("PHYSICIAN", field.GetComponent(2));
+        Assert.Equal("PHYSICIAN", field.GetComponent(2));
         
         field = segment.GetField(9); // Consulting Doctors field
         Assert.True(field.HasRepeats);
