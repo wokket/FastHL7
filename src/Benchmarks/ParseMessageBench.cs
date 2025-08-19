@@ -21,11 +21,11 @@ public class ParseMessageBench
     // All benchmarks are flawed in some respect. I've tried to do like-for-like here, but if I'm being unfair somehow let me know.
 
 /*
-| Method       | Mean       | Ratio | Gen0    | Gen1    | Allocated | Alloc Ratio |
-|------------- |-----------:|------:|--------:|--------:|----------:|------------:|
-| FastHl7      |   1.782 us |  1.00 |  0.0305 |       - |     536 B |        1.00 |
-| Hl7V2        |  28.423 us | 15.95 |  7.4463 |  1.2207 |  129384 B |      241.39 |
-| NHapi_Parser | 175.122 us | 98.28 | 29.7852 | 12.2070 |  518801 B |      967.91 |
+| Method       | Mean       | Ratio  | Gen0    | Gen1    | Allocated | Alloc Ratio |
+|------------- |-----------:|-------:|--------:|--------:|----------:|------------:|
+| FastHl7      |   1.847 us |   1.00 |  0.0172 |       - |     288 B |        1.00 |
+| Hl7V2        |  28.238 us |  15.29 |  8.1787 |  1.4343 |  128696 B |      446.86 |
+| NHapi_Parser | 215.808 us | 116.84 | 32.2266 | 13.6719 |  518664 B |    1,800.92 |
 */
 
     private static readonly string _sampleMessage = File.ReadAllText("Sample-Orm.txt");
@@ -34,7 +34,6 @@ public class ParseMessageBench
     public void FastHl7()
     {
         var msg = new FastHl7.Message(_sampleMessage);
-        //var orc = msg.GetSegment(3);
         var nte = msg.GetSegment("NTE(2)");
         
         var noteText = nte.GetField(3);
@@ -55,7 +54,6 @@ public class ParseMessageBench
     {
         var msg = new Efferent.HL7.V2.Message(_sampleMessage);
         msg.ParseMessage(true);
-        //var orc = msg.Segments()[3];
         var nte = msg.Segments("NTE")[1];
     
         var noteText = nte.Fields(3);
@@ -76,7 +74,6 @@ public class ParseMessageBench
     {
         var parser = new PipeParser();
         var msg = (parser.Parse(_sampleMessage) as ORM_O01)!; // there's normally more work involved in determining this
-        //var orc = msg.ORDERs.First().ORC;
         var nte = msg.ORDERs.First().ORDER_DETAIL.NTEs.ElementAt(1);
         var noteText = nte?.GetField(3);
         if (!(noteText?.GetValue(0)?.ToString()?.StartsWith("more text") ?? false))
