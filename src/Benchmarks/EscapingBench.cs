@@ -8,14 +8,14 @@ namespace Benchmarks;
 /*
 | Method           | Mean      | Ratio | Gen0   | Allocated | Alloc Ratio |
 |----------------- |----------:|------:|-------:|----------:|------------:|
-| FastHL7_NoEscape |  11.32 ns |  1.00 |      - |         - |          NA |
-| Hl7V2_NoEscape   |  10.93 ns |  0.97 |      - |         - |          NA |
-| FastHL7_Escape   | 112.39 ns |  9.93 | 0.0122 |     192 B |          NA |
-| Hl7V2_Escape     | 207.79 ns | 18.35 | 0.0677 |    1064 B |          NA |
+| FastHL7_NoEscape |  11.20 ns |  0.10 |      - |         - |        0.00 |
+| Hl7V2_NoEscape   |  10.83 ns |  0.10 |      - |         - |        0.00 |
+| FastHL7_Escape   | 109.93 ns |  1.00 | 0.0122 |     192 B |        1.00 |
+| Hl7V2_Escape     | 207.07 ns |  1.88 | 0.0677 |    1064 B |        5.54 
  */
 
 [MemoryDiagnoser]
-//[ShortRunJob]
+[ShortRunJob]
 [SuppressMessage("Performance", "CA1822:Mark members as static")]
 [HideColumns("BuildConfiguration", "Error", "StdDev", "RatioSD")]
 public class EscapingBench
@@ -31,11 +31,11 @@ public class EscapingBench
 
     private readonly Delimiters _delims = new(_msh);
     private readonly HL7Encoding _encoding = new();
-    
-    [Benchmark(Baseline = true)]
+
+    [Benchmark]
     public void FastHL7_NoEscape()
     {
-        var result = _noEscapeText.AsSpan().Unescape(_delims);
+        var result = EscapeSequenceExtensions.Unescape(_noEscapeText, _delims); // Extension method not picking up the span?
     }
 
     [Benchmark]
@@ -45,7 +45,7 @@ public class EscapingBench
     }
 
 
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     public void FastHL7_Escape()
     {
         var result = _escapeText.AsSpan().Unescape(_delims);

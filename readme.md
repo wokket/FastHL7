@@ -17,17 +17,17 @@ to the message structure.  If you need _every single field_ in the message, one 
 # Things to do (in no particular order)
 
 - [x] Create a message
-- [ ] Support for Components (`^`)
-- [ ] and Sub-Components (`&`)
-- [ ] Support for Repeating fields (`~`)
+- [x] Support for Components (`^`)
+- [x] and Sub-Components (`&`)
+- [x] Support for Repeating fields (`~`)
 
 - Querying (this whole space needs some cleaning up)
   - [x] Allow fetch of segments by index
   - [x] Allow fetch of segments by name/ordinal (`message.GetSegment("PID")`)
     - [x] Allow fetch of segments by name/ordinal with index (`message.GetSegment("PID(2)")`) for repeating segments
-    - [ ] Allow fetch of segments by name/ordinal with index and field (`message.QueryValue("PID(2).4")`?)  We don't know whether to return a Field, Segment, Component etc, so just the `ReadOnlySpan<char>` ?....
+    - [x] Allow fetch of segments by name/ordinal with index and field (`message.QueryValue("PID(2).4")`?)  We don't know whether to return a Field, Segment, Component etc, so just the `ReadOnlySpan<char>` ?....
   - [x] Allow fetch of fields by index (`pid.GetField(4)`)
-  - [ ] Query by path (`message.Query("NK1(2).4.1")` or similar)
+  - [x] Query by path (`message.Query("NK1(2).4.1")` or similar)
 
 
 - Samples: 
