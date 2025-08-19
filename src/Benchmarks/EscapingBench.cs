@@ -8,14 +8,14 @@ namespace Benchmarks;
 /*
 | Method           | Mean      | Ratio | Gen0   | Allocated | Alloc Ratio |
 |----------------- |----------:|------:|-------:|----------:|------------:|
-| FastHL7_NoEscape |  11.12 ns |  1.00 | 0.0018 |      32 B |        1.00 |
-| Hl7V2_NoEscape   |  14.41 ns |  1.30 | 0.0056 |      96 B |        3.00 |
-| FastHL7_Escape   | 104.50 ns |  9.40 | 0.0273 |     472 B |       14.75 |
-| Hl7V2_Escape     | 196.83 ns | 17.71 | 0.0672 |    1160 B |       36.25 |
+| FastHL7_NoEscape |  11.32 ns |  1.00 |      - |         - |          NA |
+| Hl7V2_NoEscape   |  10.93 ns |  0.97 |      - |         - |          NA |
+| FastHL7_Escape   | 112.39 ns |  9.93 | 0.0122 |     192 B |          NA |
+| Hl7V2_Escape     | 207.79 ns | 18.35 | 0.0677 |    1064 B |          NA |
  */
 
 [MemoryDiagnoser]
-[ShortRunJob]
+//[ShortRunJob]
 [SuppressMessage("Performance", "CA1822:Mark members as static")]
 [HideColumns("BuildConfiguration", "Error", "StdDev", "RatioSD")]
 public class EscapingBench
@@ -29,32 +29,31 @@ public class EscapingBench
     private const string _msh =
         "MSH|^~\\&|SendingApp|SendingFacility|ReceivingApp|ReceivingFacility|20250304132813.1234+0930||ORM^O01|1234567890|P|2.3|||AL|NE|AL|NE\r\n";
 
+    private readonly Delimiters _delims = new(_msh);
+    private readonly HL7Encoding _encoding = new();
+    
     [Benchmark(Baseline = true)]
     public void FastHL7_NoEscape()
     {
-        var delims = new Delimiters(_msh); // the 32b we allocate
-        var result = _noEscapeText.AsSpan().Unescape(delims);
+        var result = _noEscapeText.AsSpan().Unescape(_delims);
     }
 
     [Benchmark]
     public void Hl7V2_NoEscape()
     {
-        var encoding = new HL7Encoding();
-        var result = encoding.Decode(_noEscapeText);
+        var result = _encoding.Decode(_noEscapeText);
     }
 
 
     [Benchmark]
     public void FastHL7_Escape()
     {
-        var delims = new Delimiters(_msh); // the 32b we allocate
-        var result = _escapeText.AsSpan().Unescape(delims);
+        var result = _escapeText.AsSpan().Unescape(_delims);
     }
 
     [Benchmark]
     public void Hl7V2_Escape()
     {
-        var encoding = new HL7Encoding();
-        var result = encoding.Decode(_escapeText);
+        var result = _encoding.Decode(_escapeText);
     }
 }

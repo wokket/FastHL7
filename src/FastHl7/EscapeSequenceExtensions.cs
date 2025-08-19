@@ -1,3 +1,4 @@
+using Microsoft.Extensions.ObjectPool;
 using System.Text;
 
 namespace FastHl7;
@@ -21,6 +22,8 @@ public static class EscapeSequenceExtensions
     {
         return !value.IsEmpty && value.Contains(delimiters.EscapeCharacter);
     }
+    
+    private static readonly ObjectPool<StringBuilder> _stringBuilderPool = new DefaultObjectPoolProvider().CreateStringBuilderPool();
 
 
     /// <summary>
@@ -34,7 +37,7 @@ public static class EscapeSequenceExtensions
     /// - `\Z...\` Custom application escape sequences, these are custom (as are most `Z` items in HL7) and will not be replaced.
     ///
     /// Also, not all the sequences that _should_ be replaced are currently being handled, specifically:
-    /// /// - `\Cxxyy\`, '\Mxxyyzz\ arguably _should_ be handled, but aren't currently.  There's [some suggestion](https://confluence.hl7australia.com/display/OOADRM20181/Appendix+1+Parsing+HL7v2#Appendix1ParsingHL7v2-Unicodecharacters) that these are discouraged in lieu of html-escaped values
+    ///  - `\Cxxyy\`, '\Mxxyyzz\ arguably _should_ be handled, but aren't currently.  There's [some suggestion](https://confluence.hl7australia.com/display/OOADRM20181/Appendix+1+Parsing+HL7v2#Appendix1ParsingHL7v2-Unicodecharacters) that these are discouraged in lieu of html-escaped values
     ///
     /// </summary>
     /// <param name="value"></param>
@@ -50,7 +53,7 @@ public static class EscapeSequenceExtensions
         }
 
         // we're going to be replacing (mainly) 3-char sequences with single characters, so this should be a reducing operation wrt the length of the content
-        var sb = new StringBuilder(value.Length); // by using StringBuilder we don't need to track the output index
+        var sb = _stringBuilderPool.Get(); // by using StringBuilder we don't need to track the output index
         var buffer = value; // the buffer we're working on for each iteration, we re-window this as we process
 
         while (true)
@@ -124,7 +127,9 @@ public static class EscapeSequenceExtensions
             buffer = buffer[(sequenceEndIndex + 1)..]; // move past the end of the sequence
         }
 
-        return sb.ToString(); // TODO: IS there any way we can do this without allocating a new string?  Accept a buffer in as an overload ??
+        var result = sb.ToString(); // TODO: IS there any way we can do this without allocating a new string?  Accept a buffer in as an overload ??
+        _stringBuilderPool.Return(sb);
+        return result;
     }
 
 
