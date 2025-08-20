@@ -42,7 +42,7 @@ public class ParseMessageBench
             throw new(); //sanity check
         }
         
-        var receivingApp = msg.GetSegment("MSH").GetField(4).Value; // TODO: We're off by one compared to Hl7V2
+        var receivingApp = msg.Query("MSH.4"); 
         if (!receivingApp.Equals("ReceivingApp", StringComparison.OrdinalIgnoreCase))
         {
             throw new(); //sanity check

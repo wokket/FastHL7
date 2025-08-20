@@ -1,4 +1,6 @@
 using FastHl7;
+using JetBrains.dotMemoryUnit;
+using Xunit.Abstractions;
 
 namespace UnitTests;
 
@@ -53,9 +55,10 @@ public class QueryTests
 
     private readonly Efferent.HL7.V2.Message _hlzV2Message = new (_message);
 
-    public QueryTests()
+    public QueryTests(ITestOutputHelper output)
     {
-        _hlzV2Message.ParseMessage(true);
+        DotMemoryUnitTestOutput.SetOutputMethod(output.WriteLine);
+        
     }
     
     
@@ -81,13 +84,13 @@ public class QueryTests
     public void TestHl7V2BackCompat(string query, string _)
     {
         var msg = new Message(_message);
-
+        _hlzV2Message.ParseMessage(true);
+        
         var expected = _hlzV2Message.GetValue(query);
         var actual = msg.Query(query);
         
         Assert.Equal(expected, actual);
-
-
+        
     }
 
 

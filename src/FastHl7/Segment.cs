@@ -1,17 +1,24 @@
 namespace FastHl7;
 
-public readonly ref struct Segment
+public ref struct Segment
 {
     private readonly Delimiters _delimiters;
-    private readonly Range[] _fields;
+    private Range[]? _fields;
 
     public Segment(ReadOnlySpan<char> value, Delimiters delimiters)
     {
         Value = value;
         _delimiters = delimiters;
-
-        _fields = SplitHelper.Split(value, _delimiters.FieldDelimiter);
     }
+
+    private Range[] Fields
+    {
+        get
+        {
+            _fields ??= SplitHelper.Split(Value, _delimiters.FieldDelimiter);
+            return _fields;
+        }
+    } 
 
     public bool HasValue => !Value.IsEmpty;
 
@@ -28,7 +35,7 @@ public readonly ref struct Segment
     /// <summary>
     /// Gets the number of (possibly empty) fields in this segment
     /// </summary>
-    public int FieldCount => _fields.Length;
+    public int FieldCount => Fields.Length;
 
     /// <summary>
     /// Gets the field at the given index.  Index 0 is always the Segment name (eg MSH).
@@ -39,12 +46,12 @@ public readonly ref struct Segment
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public Field GetField(int i)
     {
-        if (_fields.Length <= i || i < 0)
+        if (Fields.Length <= i || i < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(i), "Field index is out of range.");
         }
 
-        return new(Value[_fields[i]], _delimiters);
+        return new(Value[Fields[i]], _delimiters);
     }
 
     /// <summary>
@@ -57,7 +64,7 @@ public readonly ref struct Segment
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public Field GetField(int index, int repeat)
     {
-        if (_fields.Length <= index || index < 0)
+        if (Fields.Length <= index || index < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(index), "Field index is out of range.");
         }
@@ -67,7 +74,7 @@ public readonly ref struct Segment
             throw new ArgumentOutOfRangeException(nameof(repeat), "Repeat must be positive");
         }
 
-        var fieldValue = Value[_fields[index]];
+        var fieldValue = Value[Fields[index]];
 
         Span<Range> repeats = stackalloc Range[20]; 
         var repeatCount = SplitHelper.Split(fieldValue, _delimiters.RepeatDelimiter, repeats);

@@ -1,5 +1,5 @@
-﻿using System.Diagnostics;
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
+
 [assembly: InternalsVisibleTo("UnitTests")]
 [assembly: InternalsVisibleTo("Benchmarks")]
 
@@ -110,11 +110,10 @@ public readonly ref struct Message
         
         // The first part of the query is the segment, possibly with a repeat index
         
-        // This is a very simple query, just return the segment text
-        // If we want to do more complex queries, we can implement that later
         var segment = GetSegment(query[queryParts[0]]);
         
-        if (queryPartsCount == 1 || !segment.HasValue) // just want the segment text, or we couldn't find the segment asked for
+        // just want the segment text, or we couldn't find the segment asked for
+        if (queryPartsCount == 1 || !segment.HasValue) 
         {
             return segment.Value;
         }
