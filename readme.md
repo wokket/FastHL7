@@ -1,5 +1,7 @@
 # Fast HL7 Library
 
+[![CI Build](https://github.com/wokket/FastHL7/actions/workflows/ci.yml/badge.svg)](https://github.com/wokket/FastHL7/actions/workflows/ci.yml)
+
 There are (at least) two other .Net HL7 libraries that are well known in the community:
 - [NHapi](https://github.com/nHapiNET/nHapi) is ridiculously fully featured, use it and love it if you want strongly typed spec compliant messages.
 - [HL7-V2](https://github.com/Efferent-Health/HL7-V2) has a nice design ethos and is much lighter than NHapi, but has many years of legacy code and forked history, _interesting_ coding standards and Net4.8 back compat to worry about.  As a previous contributor to this library you may see similarities :)
