@@ -16,9 +16,9 @@ namespace Benchmarks;
 public class ParseMessageBench
 {
     // This uses the same sample message I added to Hl7-V2 which is a very feature complete message (encodings, escape chars etc)
-    // While this library is all about perf (and perf is a feature), this lib isn't yet anything like spec compliant, so take with a truck full of salt.
+    // While this library is all about perf (and perf is a feature), this lib isn't yet spec compliant, so take with a truck full of salt.
 
-    // All benchmarks are flawed in some respect. I've tried to do like-for-like here, but if I'm being unfair somehow let me know.
+    // All benchmarks are flawed in some respect. I've tried to do like-for-like as best I can here, but if I'm being unfair somehow let me know.
 
 /*
 | Method       | Mean       | Ratio  | Gen0    | Gen1    | Allocated | Alloc Ratio |

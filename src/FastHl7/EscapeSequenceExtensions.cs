@@ -31,7 +31,7 @@ public static class EscapeSequenceExtensions
     /// - `\E\`,`\F\`, '\R\`, `\S\`, `\T\` are all handled, and replaced with the Escape, Field, Repeat, Component and Sub-Component separator chars respectively
     /// - `\X..\` hexadecimal escape sequences are supported (2 hex digits per char)
     ///
-    /// The following sequences are **NOT** replaced by design and will be left in the string:
+    /// The following sequences are **NOT** replaced by design and will be left unaltered in the value:
     /// - `\H\` Indicates the start of highlighted text, this is a consuming application problem and will not be replaced.
     /// - `\N\` Indicates the end of highlighted text and resumption of normal text.  This is a consuming application problem and will not be replaced.
     /// - `\Z...\` Custom application escape sequences, these are custom (as are most `Z` items in HL7) and will not be replaced.
@@ -49,7 +49,7 @@ public static class EscapeSequenceExtensions
 
         if (!value.RequiresUnescaping(delimiters))
         {
-            return value; // no escaping required, just return the original string
+            return value; // no escaping required, just return the original value
         }
 
         // we're going to be replacing (mainly) 3-char sequences with single characters, so this should be a reducing operation wrt the length of the content
