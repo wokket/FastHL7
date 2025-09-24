@@ -28,7 +28,18 @@ public readonly ref struct Segment
     /// <summary>
     /// Gets the number of (possibly empty) fields in this segment
     /// </summary>
-    public int FieldCount => _fields.Length;
+    public int FieldCount
+    {
+        get
+        {
+            if (Name.Equals("MSH", StringComparison.OrdinalIgnoreCase))
+            {
+                // MSH is a special cat, field 1 is the field delim char, and field 2 the remainder of the encoding chars
+                return _fields.Length + 1; // offset by one
+            }
+            return _fields.Length;
+        }
+    }
 
     /// <summary>
     /// Gets the field at the given index.  Index 0 is always the Segment name (eg MSH).
@@ -39,10 +50,29 @@ public readonly ref struct Segment
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public Field GetField(int i)
     {
-        if (_fields.Length <= i || i < 0)
+        if (FieldCount <= i || i < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(i), "Field index is out of range.");
         }
+
+        // MSH is a special cat, field 1 is the field delim char, and field 2 the remainder of the encoding chars
+        if (Name.Equals("MSH", StringComparison.OrdinalIgnoreCase))
+        {
+            switch (i)
+            {
+                case 1:
+                    return new(new[] { _delimiters.FieldDelimiter }, _delimiters);
+                case 2:
+                {
+                    // field 2 is the rest of field 1
+                    var encodingChars = Value[_fields[1]]; // Everything but first char
+                    return new(encodingChars, _delimiters);
+                }
+                default:
+                    return new(Value[_fields[i-1]], _delimiters); // all the others are offset now
+            }
+        }
+
 
         return new(Value[_fields[i]], _delimiters);
     }
@@ -69,14 +99,14 @@ public readonly ref struct Segment
 
         var fieldValue = Value[_fields[index]];
 
-        Span<Range> repeats = stackalloc Range[20]; 
+        Span<Range> repeats = stackalloc Range[20];
         var repeatCount = SplitHelper.Split(fieldValue, _delimiters.RepeatDelimiter, repeats);
         if (repeat > repeatCount)
         {
             throw new ArgumentOutOfRangeException(nameof(repeat), "Asked for repeat field doesn't have");
         }
 
-        fieldValue = fieldValue[repeats[repeat-1]];
+        fieldValue = fieldValue[repeats[repeat - 1]];
 
         return new(fieldValue, _delimiters);
     }
@@ -118,14 +148,16 @@ public readonly ref struct Segment
 
             if (!int.TryParse(fieldQuery[..parenIndex], out fieldIndex))
             {
-                throw new ArgumentOutOfRangeException(nameof(query), "First part of query should be a numeric field index");
+                throw new ArgumentOutOfRangeException(nameof(query),
+                    "First part of query should be a numeric field index");
             }
         }
         else // no parens, simple parse
         {
             if (!int.TryParse(fieldQuery, out fieldIndex))
             {
-                throw new ArgumentOutOfRangeException(nameof(query), "First part of query should be a numeric field index");
+                throw new ArgumentOutOfRangeException(nameof(query),
+                    "First part of query should be a numeric field index");
             }
         }
 

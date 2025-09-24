@@ -16,16 +16,16 @@ namespace Benchmarks;
 public class ParseMessageBench
 {
     // This uses the same sample message I added to Hl7-V2 which is a very feature complete message (encodings, escape chars etc)
-    // While this library is all about perf (and perf is a feature), this lib isn't yet spec compliant, so take with a truck full of salt.
+    // While this library is all about perf (and perf is a feature), this lib has not been battle tested in production so take with a truck full of salt.
 
     // All benchmarks are flawed in some respect. I've tried to do like-for-like as best I can here, but if I'm being unfair somehow let me know.
 
 /*
 | Method       | Mean       | Ratio  | Gen0    | Gen1    | Allocated | Alloc Ratio |
 |------------- |-----------:|-------:|--------:|--------:|----------:|------------:|
-| FastHl7      |   1.847 us |   1.00 |  0.0172 |       - |     288 B |        1.00 |
-| Hl7V2        |  28.238 us |  15.29 |  8.1787 |  1.4343 |  128696 B |      446.86 |
-| NHapi_Parser | 215.808 us | 116.84 | 32.2266 | 13.6719 |  518664 B |    1,800.92 |
+| FastHl7      |   1.620 us |   1.00 |  0.0153 |       - |     288 B |        1.00 |                                                                                                                                                                                                                                        
+| Hl7V2        |  25.401 us |  15.68 |  7.4463 |  1.2817 |  128696 B |      446.86 |
+| NHapi_Parser | 172.307 us | 106.38 | 29.2969 | 12.6953 |  518875 B |    1,801.65 |
 */
 
     private static readonly string _sampleMessage = File.ReadAllText("Sample-Orm.txt");
@@ -42,10 +42,10 @@ public class ParseMessageBench
             throw new(); //sanity check
         }
         
-        var receivingApp = msg.GetSegment("MSH").GetField(4).Value; // TODO: We're off by one compared to Hl7V2
+        var receivingApp = msg.Query("MSH.5");
         if (!receivingApp.Equals("ReceivingApp", StringComparison.OrdinalIgnoreCase))
         {
-            throw new(); //sanity check
+            throw new($"'{receivingApp}' is not expected value"); //sanity check
         }
     }
     

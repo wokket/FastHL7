@@ -87,13 +87,12 @@ public readonly ref struct Message
     /// <summary>
     /// This takes a dot-delimited query, and returns the raw message text for that query.
     /// eg, Query("MSH") will return the MSH segment text, while Query("PID(2).3.1") will return the 1st component of the third field of the 2nd PID segment.
+    /// Fields are effectively 1-based indexing per HL7 spec.
     /// </summary>
     /// <param name="query"></param>
     /// <returns></returns>
     public ReadOnlySpan<char> Query(ReadOnlySpan<char> query)
     {
-        // TODO: Formalise the query syntax, and add support for repeating fields/components/sub-components when the rest of the library gets it
-        // TODO: We're a bit adhoc on 0 or 1-based indexing... sort that out
         if (query.IsEmpty)
         {
             return null;
