@@ -71,7 +71,7 @@ jobs:
       uses: EnricoMi/publish-unit-test-result-action@v2.20.0
       if: always()
       with:
-        trx_files: "${{ github.workspace }}/**/*.trx"
+        files: "${{ github.workspace }}/**/*.trx"
 
     - name: Publish coverage in build summary # Only applicable if 'MarkdownSummaryGithub' or one of the other Markdown report types is generated
       run: cat ${{ github.workspace }}/SummaryGithub.md >> $GITHUB_STEP_SUMMARY # Adjust path and filename if necessary
