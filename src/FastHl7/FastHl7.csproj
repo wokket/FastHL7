@@ -17,7 +17,7 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        
+        <EnablePackageVerification>true</EnablePackageVerification>
 
         <PackageId>FastHl7</PackageId>
         <AssemblyVersion>1.0.0</AssemblyVersion>
