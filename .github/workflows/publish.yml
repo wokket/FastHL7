@@ -28,7 +28,7 @@ jobs:
       uses: actions/setup-dotnet@v5
     
     - name: Create NuGet package
-      run: dotnet pack -c Release  --output ${{ env.NuGetDirectory }}
+      run: dotnet pack src/FastHl7/FastHl7.csproj -c Release  --output ${{ env.NuGetDirectory }}
       
       # Publish the NuGet package as an artifact, so they can be used in the following jobs
     - name: Save package artifact
