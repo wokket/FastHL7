@@ -13,8 +13,11 @@
         <!-- Manage versions explicitly for the library in here so we can have floating version numbers -->
         <!-- Nuget libs shouldn't specify fixed versions: https://learn.microsoft.com/en-us/nuget/concepts/package-versioning?tabs=semver20sort#best-practice -->
         <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
-        <DebugType>embedded</DebugType>
+        <DebugType>portable</DebugType>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        
 
         <PackageId>FastHl7</PackageId>
         <AssemblyVersion>1.0.0</AssemblyVersion>
