@@ -40,6 +40,7 @@ internal static class SplitHelper
     /// Find the int value nestled between parens
     /// </summary>
     /// <param name="input"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
     public static bool TryGetIntBetweenParens(ReadOnlySpan<char> input, out int value)
     {

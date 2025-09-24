@@ -19,6 +19,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{72A9D103-3
 		..\docs\design-notes.md = ..\docs\design-notes.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{06E91C52-E441-4176-B0A8-0B7355E3AA36}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\ci.yml = ..\.github\workflows\ci.yml
+		..\.github\dependabot.yml = ..\.github\dependabot.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -40,5 +46,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{72A9D103-3E86-45FE-AA83-E1B67D02BE57} = {4FAA8273-65C8-45A8-B223-6182FEAFC4FC}
+		{06E91C52-E441-4176-B0A8-0B7355E3AA36} = {4FAA8273-65C8-45A8-B223-6182FEAFC4FC}
 	EndGlobalSection
 EndGlobal

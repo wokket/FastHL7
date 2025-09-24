@@ -1,11 +1,15 @@
 namespace FastHl7;
 
+/// <summary>
+/// Represents a single Segment(line) of a HL7 message.
+/// You normally don't construct these yourself as a consumer of the library, but get access via the <see cref="Message"/> type.
+/// </summary>
 public readonly ref struct Segment
 {
     private readonly Delimiters _delimiters;
     private readonly Range[] _fields;
 
-    public Segment(ReadOnlySpan<char> value, Delimiters delimiters)
+    internal Segment(ReadOnlySpan<char> value, Delimiters delimiters)
     {
         Value = value;
         _delimiters = delimiters;
@@ -13,6 +17,9 @@ public readonly ref struct Segment
         _fields = SplitHelper.Split(value, _delimiters.FieldDelimiter);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public bool HasValue => !Value.IsEmpty;
 
     /// <summary>

@@ -9,7 +9,12 @@ public ref struct Field
     private readonly Delimiters _delimiters;
     private Range[]? _components;
 
-    public Field(ReadOnlySpan<char> value, Delimiters delimiters)
+    /// <summary>
+    /// Construct a new field from the given value and delimiters.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="delimiters"></param>
+    internal Field(ReadOnlySpan<char> value, Delimiters delimiters)
     {
         Value = value;
         _delimiters = delimiters;

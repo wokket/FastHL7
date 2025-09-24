@@ -5,6 +5,17 @@ using System.Runtime.CompilerServices;
 
 namespace FastHl7;
 
+/// <summary>
+/// The top-level construct in this library, representing a full HL7 message.
+/// You generally want to create this from a string containing the full message text, and then perform operations
+/// on it to extract/query segments, fields, components etc.
+/// </summary>
+/// <remarks>
+/// Note that this is a ref struct, and so is stack-only.  This is by design to avoid heap allocations and GC pressure.
+/// 
+/// If you need to hold onto a message for longer than the current stack frame, constructing a new <see cref="Message" /> from the
+/// source string is so fast that you should probably store the original string instead.
+/// </remarks>
 public readonly ref struct Message
 {
     private readonly Span<Range> _segments;

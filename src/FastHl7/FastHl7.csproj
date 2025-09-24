@@ -8,8 +8,37 @@
         <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
 
+    <!-- specifically because it's a nuget package -->
+    <PropertyGroup>
+        <!-- Manage versions explicitly for the library in here so we can have floating version numbers -->
+        <!-- Nuget libs shouldn't specify fixed versions: https://learn.microsoft.com/en-us/nuget/concepts/package-versioning?tabs=semver20sort#best-practice -->
+        <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+        <DebugType>embedded</DebugType>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+        <PackageId>FastHl7</PackageId>
+        <AssemblyVersion>1.0.0</AssemblyVersion>
+        <Version>1.0.0-alpha01</Version>
+        <Authors>Tim Thompson; FastHl7 Contributors</Authors>
+        <Copyright>©Tim Thompson.  All rights reserved.</Copyright>
+        <PackageReadmeFile>nuget.md</PackageReadmeFile>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/wokket/FastHL7</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/wokket/FastHL7</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>HL7</PackageTags>
+        <Description>
+            A very fast, low allocation HL7 V2 parser for modern .Net applications that is simple to use.
+        </Description>
+    </PropertyGroup>
+
     <ItemGroup>
-      <PackageReference Include="Microsoft.Extensions.ObjectPool" />
+        <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="9.*"/>
     </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="nuget.md" Pack="true" PackagePath=""/>
+    </ItemGroup>
+
 
 </Project>
