@@ -23,6 +23,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v5
+      with:
+        fetch-depth: 0 # To get release tags
+       
+    - name: Check for release tag in current commit
+      run: echo "tag=$(git describe --tags --abbrev=0 --match 'v*' --exact-match)" >> "$GITHUB_ENV"
+        
     - name: Setup .NET
       uses: actions/setup-dotnet@v5
       with:
@@ -78,3 +84,6 @@ jobs:
       run: cat ${{ github.workspace }}/SummaryGithub.md >> $GITHUB_STEP_SUMMARY # Adjust path and filename if necessary
       shell: bash
     
+    - name: Create NuGet package
+      if: startsWith(env.tag, 'v')
+      run: dotnet pack --configuration Release --no-build
