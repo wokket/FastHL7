@@ -18,6 +18,7 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <EnablePackageVerification>true</EnablePackageVerification>
+        <MinVerTagPrefix>v</MinVerTagPrefix>
 
         <PackageId>FastHl7</PackageId>
         <AssemblyVersion>1.0.0</AssemblyVersion>
