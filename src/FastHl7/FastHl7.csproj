@@ -8,6 +8,14 @@
         <IsAotCompatible>true</IsAotCompatible>
     </PropertyGroup>
 
+    <Target Name="MyTarget" AfterTargets="MinVer">
+        <PropertyGroup>
+            <FileVersion>$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)</FileVersion>
+            <AssemblyVersion>$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)</AssemblyVersion>
+            <Version>$(MinVerMajor).$(MinVerMinor).$(MinVerPatch)</Version>
+        </PropertyGroup>
+    </Target>
+
     <!-- specifically because it's a nuget package -->
     <PropertyGroup>
         <!-- Manage versions explicitly for the library in here so we can have floating version numbers -->
@@ -21,8 +29,6 @@
         <MinVerTagPrefix>v</MinVerTagPrefix>
 
         <PackageId>FastHl7</PackageId>
-        <AssemblyVersion>1.0.0</AssemblyVersion>
-        <Version>1.0.0-alpha01</Version>
         <Authors>Tim Thompson; FastHl7 Contributors</Authors>
         <Copyright>©Tim Thompson.  All rights reserved.</Copyright>
         <PackageReadmeFile>nuget.md</PackageReadmeFile>
