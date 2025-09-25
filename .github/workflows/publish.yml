@@ -43,6 +43,8 @@ jobs:
         
   validate_nuget:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: [ create_nuget ]
     steps:
       # Install the .NET SDK indicated in the global.json file
