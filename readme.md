@@ -17,7 +17,7 @@ to the message structure.  If you need _every single field_ in the message, one 
  
 ## How fast is it?
 
-There's a set of benchmarks in the [./src/Benchmarks] directory, but the TL;DR is that it's _very_ fast, and _very_ low allocation:
+There's a set of benchmarks in the [Benchmarks](./src/Benchmarks) directory, but the TL;DR is that it's _very_ fast, and _very_ low allocation:
 
 To parse a fully featured message and query some data: 
 ```
