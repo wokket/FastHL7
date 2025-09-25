@@ -116,9 +116,8 @@ public ref struct Field
         }
 
         Span<Range> components = stackalloc Range[10];
-        var componentCount = SplitHelper.Split(valueToQuery, _delimiters.ComponentDelimiter, components);
+        _ = SplitHelper.Split(valueToQuery, _delimiters.ComponentDelimiter, components);
         
-
         var valueToReturn = Value[components[componentIndex - 1]]; // -1 for 1-based indexing like Hl7V2
 
         if (queryPartsCount == 1)

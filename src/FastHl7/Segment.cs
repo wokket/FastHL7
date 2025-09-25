@@ -61,27 +61,27 @@ public readonly ref struct Segment
         {
             throw new ArgumentOutOfRangeException(nameof(i), "Field index is out of range.");
         }
-
-        // MSH is a special cat, field 1 is the field delim char, and field 2 the remainder of the encoding chars
-        if (Name.Equals("MSH", StringComparison.OrdinalIgnoreCase))
+        
+        if (!Name.Equals("MSH", StringComparison.OrdinalIgnoreCase))
         {
-            switch (i)
-            {
-                case 1:
-                    return new(new[] { _delimiters.FieldDelimiter }, _delimiters);
-                case 2:
-                {
-                    // field 2 is the rest of field 1
-                    var encodingChars = Value[_fields[1]]; // Everything but first char
-                    return new(encodingChars, _delimiters);
-                }
-                default:
-                    return new(Value[_fields[i-1]], _delimiters); // all the others are offset now
-            }
+            return new(Value[_fields[i]], _delimiters);
         }
 
-
-        return new(Value[_fields[i]], _delimiters);
+        // MSH is a special cat, field 1 is the field delim char, and field 2 the remainder of the encoding chars
+        switch (i)
+        {
+            case 1:
+                return new(new[] { _delimiters.FieldDelimiter }, _delimiters);
+            case 2:
+            {
+                // field 2 is the rest of field 1
+                var encodingChars = Value[_fields[1]]; // Everything but first char
+                return new(encodingChars, _delimiters);
+            }
+            default:
+                return new(Value[_fields[i-1]], _delimiters); // all the others are offset now
+        }
+        
     }
 
     /// <summary>
@@ -92,7 +92,7 @@ public readonly ref struct Segment
     /// <param name="repeat">1-based index</param>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public Field GetField(int index, int repeat)
+    internal Field GetField(int index, int repeat)
     {
         if (_fields.Length <= index || index < 0)
         {
