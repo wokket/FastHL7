@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("UnitTests")]
 [assembly: InternalsVisibleTo("Benchmarks")]
 
@@ -15,6 +16,7 @@ namespace FastHl7;
 /// If you need to hold onto a message for longer than the current stack frame, constructing a new <see cref="Message" /> from the
 /// source string is so fast that you should probably store the original string instead.
 /// </remarks>
+[DebuggerDisplay("{MessageText}")]
 public readonly ref struct Message
 {
     private readonly Span<Range> _segments;

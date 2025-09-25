@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace FastHl7;
 
 /// <summary>
@@ -25,7 +27,7 @@ public readonly struct Delimiters
         EscapeCharacter = message[6];
         SubComponentDelimiter = message[7];
     }
-
+    
     /// <summary>
     /// The sub-component delimiter, typically '&amp;'
     /// </summary>

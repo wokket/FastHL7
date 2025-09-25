@@ -11,7 +11,7 @@ public class SegmentTests
         const string text =
             "MSH|^~\\&|SendingApp|SendingFac|ReceivingApp|ReceivingFac|202310101010||ADT^A01|1234567890|P|2.3";
         var delimiters = new Delimiters(text);
-        var segment = new Segment(text.AsSpan(), delimiters);
+        var segment = new Segment(text, delimiters);
 
         // Act & Assert
         Assert.Equal("MSH", segment.Name);

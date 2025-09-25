@@ -1,9 +1,12 @@
+using System.Diagnostics;
+
 namespace FastHl7;
 
 /// <summary>
 /// Represents a single Segment(line) of a HL7 message.
 /// You normally don't construct these yourself as a consumer of the library, but get access via the <see cref="Message"/> type.
 /// </summary>
+[DebuggerDisplay("{Value}")]
 public readonly ref struct Segment
 {
     private readonly Delimiters _delimiters;

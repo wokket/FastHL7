@@ -1,9 +1,12 @@
+using System.Diagnostics;
+
 namespace FastHl7;
 
 /// <summary>
 /// Fields can contain repeats, components, and sub-components.
 /// See [the spec](http://www.hl7.eu/HL7v2x/v251/std251/ch02.html#Heading13) for more info
 /// </summary>
+[DebuggerDisplay("{Value}")]
 public ref struct Field
 {
     private readonly Delimiters _delimiters;
