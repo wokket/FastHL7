@@ -1,6 +1,6 @@
 # Fast HL7 Library
 
-[![CI Build](https://github.com/wokket/FastHL7/actions/workflows/ci.yml/badge.svg)](https://github.com/wokket/FastHL7/actions/workflows/ci.yml)
+[![CI Build](https://github.com/wokket/FastHL7/actions/workflows/ci.yml/badge.svg)](https://github.com/wokket/FastHL7/actions/workflows/ci.yml) [![NuGet version (FastHl7)](https://img.shields.io/nuget/v/FastHl7.svg?style=flat-square)](https://www.nuget.org/packages/FastHl7/)
 
 There are (at least) two other .Net HL7 libraries that are well known in the community:
 - [NHapi](https://github.com/nHapiNET/nHapi) is ridiculously fully featured, use it and love it if you want strongly typed spec compliant messages.
@@ -31,6 +31,30 @@ To parse a fully featured message and query some data:
 As noted over there it's difficult to do a truly apples-apples comparisons of some features, but if you think a benchmark is unfair/misleading then 
 please submit a PR to make it better!
 
+## Installation and Getting Started
+
+Pretty simple:
+- Add a reference to the [FastHl7 Nuget package](https://www.nuget.org/packages/FastHl7/)
+- Create a message from a string:
+  - ```csharp
+    using FastHl7;
+    var message = Message.Parse(hl7MessageString); // Stream/ReadOnlySpan<char> overloads coming soon
+    ```
+    
+- Query segments, fields etc:
+  - ```csharp
+      var patientFirstName = message.Query("PID.5.2");
+      ```
+
+- There are helpers for date time conversions/de-escaping special chars:
+  - ```csharp
+      var dobText = message.Query("PID.7");
+      var dobAsDate = dobText.AsDate();
+     ```
+  - ```csharp
+    var noteText = message.Query("NTE.3");
+    var unescapedNote = noteText.Unescape();
+    ```
 
 # Things to do (in no particular order)
 
