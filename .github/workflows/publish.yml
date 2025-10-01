@@ -1,0 +1,110 @@
+# Run manually to create a nuget package, but it won't be uploaded.
+# Create a github release (even if pre-release) to have it uploaded to nuget.org
+
+
+name: Publish Build
+
+on:
+  workflow_dispatch: # Allow running the workflow manually from the GitHub UI
+  release:
+    types:
+      - published    # Run the workflow when a new GitHub release is published
+
+env:
+  NuGetDirectory: ${{ github.workspace}}/nuget
+
+jobs:
+  create_nuget:
+    
+    # Permissions this GitHub Action needs for other things in GitHub
+    permissions: write-all
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v5
+      with:
+        fetch-depth: 0 # To get release tags
+        filter: tree:0 # better perf
+  
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+    
+    - name: Create NuGet package
+      run: dotnet pack src/FastHl7/FastHl7.csproj -c Release  --output ${{ env.NuGetDirectory }}
+      
+      # Publish the NuGet package as an artifact, so they can be used in the following jobs
+    - name: Save package artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget
+        if-no-files-found: error
+        retention-days: 7
+        path: ${{ env.NuGetDirectory }}/*.*pkg # include .snupkg
+        
+  validate_nuget:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    needs: [ create_nuget ]
+    steps:
+      # Install the .NET SDK indicated in the global.json file
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+      
+      # Download the NuGet package created in the previous job
+      - uses: actions/download-artifact@v5
+        with:
+          name: nuget
+          path: ${{ env.NuGetDirectory }}
+
+      - name: Install nuget validator
+        run: dotnet tool update Meziantou.Framework.NuGetPackageValidation.Tool --global
+      
+      # Validate metadata and content of the NuGet package
+      # https://www.nuget.org/packages/Meziantou.Framework.NuGetPackageValidation.Tool#readme-body-tab
+      # If some rules are not applicable, you can disable them
+      # using the --excluded-rules or --excluded-rule-ids option
+      - name: Validate package
+        run: meziantou.validate-nuget-package ${{ env.NuGetDirectory }}/*.nupkg --excluded-rules IconMustBeSet,Symbols 
+        
+  deploy-nuget-package:
+    # Publish only when creating a GitHub Release
+    # https://docs.github.com/en/repositories/releasing-projects-on-github/managing-releases-in-a-repository
+    # You can update this logic if you want to manage releases differently
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    needs: [ validate_nuget ]
+    defaults:
+      run:
+        shell: pwsh
+        
+    permissions:
+      id-token: write  # enable GitHub OIDC token issuance for this job
+    
+    steps:
+      # Download the NuGet package created in the previous job
+      - uses: actions/download-artifact@v5
+        with:
+          name: nuget
+          path: ${{ env.NuGetDirectory }}
+      
+      # Install the .NET SDK indicated in the global.json file
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v5
+          
+      # Get a short-lived NuGet API key (Trusted Publishing https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing)
+      - name: NuGet login (OIDC → temp API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      
+      # Publish all NuGet packages to NuGet.org
+      # Use --skip-duplicate to prevent errors if a package with the same version already exists.
+      # If you retry a failed workflow, already published packages will be skipped without error.
+      - name: Publish NuGet package
+        run: |
+          foreach($file in (Get-ChildItem "${{ env.NuGetDirectory }}" -Recurse -Include *.*pkg)) {
+              dotnet nuget push $file --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
+          }

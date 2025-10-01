@@ -1,20 +1,46 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("UnitTests")]
 [assembly: InternalsVisibleTo("Benchmarks")]
 
 namespace FastHl7;
 
+/// <summary>
+/// The top-level construct in this library, representing a full HL7 message.
+/// You generally want to create this from a string containing the full message text, and then perform operations
+/// on it to extract/query segments, fields, components etc.
+/// </summary>
+/// <remarks>
+/// Note that this is a ref struct, and so is stack-only.  This is by design to avoid heap allocations and GC pressure.
+/// 
+/// If you need to hold onto a message for longer than the current stack frame, constructing a new <see cref="Message" /> from the
+/// source string is so fast that you should probably store the original string instead.
+/// </remarks>
+[DebuggerDisplay("{MessageText}")]
 public readonly ref struct Message
 {
     private readonly Span<Range> _segments;
     private readonly Delimiters _delimiters;
-
+/*
     /// <summary>
     /// 
     /// </summary>
     /// <param name="message">This should be the only place we alloc a string in the lib!</param>
     public Message(string message)
+    {
+        MessageText = message;
+        _delimiters = new(MessageText);
+        _segments = SplitHelper.SplitSegments(MessageText);
+    }
+    */
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="message"></param>
+    public Message(ReadOnlySpan<char> message)
     {
         MessageText = message;
         _delimiters = new(MessageText);
@@ -87,13 +113,12 @@ public readonly ref struct Message
     /// <summary>
     /// This takes a dot-delimited query, and returns the raw message text for that query.
     /// eg, Query("MSH") will return the MSH segment text, while Query("PID(2).3.1") will return the 1st component of the third field of the 2nd PID segment.
+    /// Fields are effectively 1-based indexing per HL7 spec.
     /// </summary>
     /// <param name="query"></param>
     /// <returns></returns>
     public ReadOnlySpan<char> Query(ReadOnlySpan<char> query)
     {
-        // TODO: Formalise the query syntax, and add support for repeating fields/components/sub-components when the rest of the library gets it
-        // TODO: We're a bit adhoc on 0 or 1-based indexing... sort that out
         if (query.IsEmpty)
         {
             return null;

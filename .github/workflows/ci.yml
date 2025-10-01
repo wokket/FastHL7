@@ -1,12 +1,15 @@
 # This workflow will build a .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
-name: .NET
+name: CI Build
 
 on:
   push:
     branches:
       - '**'
+    paths:
+      - 'src/**'
+      - '.github/workflows/ci.yml'
 
   pull_request:
     branches: [ "main" ]
@@ -20,10 +23,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v5
+
     - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.x.x
+      uses: actions/setup-dotnet@v5
 
     - name: Install Coverage Report Generator
       run: dotnet tool install -g dotnet-reportgenerator-globaltool  
@@ -41,7 +43,7 @@ jobs:
       working-directory: src/UnitTests
       
     - name: Combine Coverage Reports # This is because one report is produced per project, and we want one result for all of them.
-      uses: danielpalme/ReportGenerator-GitHub-Action@5.4.12
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.4.16
       with:
         reports: "**/*.cobertura.xml" # REQUIRED # The coverage reports that should be parsed (separated by semicolon). Globbing is supported.
         targetdir: "${{ github.workspace }}" # REQUIRED # The directory where the generated report should be saved.
@@ -69,9 +71,8 @@ jobs:
       uses: EnricoMi/publish-unit-test-result-action@v2.20.0
       if: always()
       with:
-        trx_files: "${{ github.workspace }}/**/*.trx"
+        files: "${{ github.workspace }}/**/*.trx"
 
     - name: Publish coverage in build summary # Only applicable if 'MarkdownSummaryGithub' or one of the other Markdown report types is generated
       run: cat ${{ github.workspace }}/SummaryGithub.md >> $GITHUB_STEP_SUMMARY # Adjust path and filename if necessary
       shell: bash
-    

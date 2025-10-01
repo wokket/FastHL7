@@ -1,15 +1,23 @@
+using System.Diagnostics;
+
 namespace FastHl7;
 
 /// <summary>
 /// Fields can contain repeats, components, and sub-components.
 /// See [the spec](http://www.hl7.eu/HL7v2x/v251/std251/ch02.html#Heading13) for more info
 /// </summary>
+[DebuggerDisplay("{Value}")]
 public ref struct Field
 {
     private readonly Delimiters _delimiters;
     private Range[]? _components;
 
-    public Field(ReadOnlySpan<char> value, Delimiters delimiters)
+    /// <summary>
+    /// Construct a new field from the given value and delimiters.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="delimiters"></param>
+    internal Field(ReadOnlySpan<char> value, Delimiters delimiters)
     {
         Value = value;
         _delimiters = delimiters;
@@ -111,9 +119,8 @@ public ref struct Field
         }
 
         Span<Range> components = stackalloc Range[10];
-        var componentCount = SplitHelper.Split(valueToQuery, _delimiters.ComponentDelimiter, components);
+        _ = SplitHelper.Split(valueToQuery, _delimiters.ComponentDelimiter, components);
         
-
         var valueToReturn = Value[components[componentIndex - 1]]; // -1 for 1-based indexing like Hl7V2
 
         if (queryPartsCount == 1)

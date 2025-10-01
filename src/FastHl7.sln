@@ -7,6 +7,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		..\readme.md = ..\readme.md
 		Directory.Packages.props = Directory.Packages.props
 		.editorconfig = .editorconfig
+		CodeCoverage.runsettings = CodeCoverage.runsettings
+		..\global.json = ..\global.json
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{8F2781B3-4286-4196-B895-0196C762E7FE}"
@@ -17,6 +19,18 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{72A9D103-3
 	ProjectSection(SolutionItems) = preProject
 		..\docs\design-notes.md = ..\docs\design-notes.md
 	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{06E91C52-E441-4176-B0A8-0B7355E3AA36}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\ci.yml = ..\.github\workflows\ci.yml
+		..\.github\dependabot.yml = ..\.github\dependabot.yml
+		..\.github\workflows\codeql.yml = ..\.github\workflows\codeql.yml
+		..\.github\workflows\publish.yml = ..\.github\workflows\publish.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{585EACB5-1A55-461C-AB71-8BA18EEFBCC6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SocketReader", "samples\SocketReader\SocketReader.csproj", "{E0F83E58-949E-4C91-9279-ECD0CBED972F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,8 +50,14 @@ Global
 		{726719E4-4F96-4692-AD64-E744FE1222D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{726719E4-4F96-4692-AD64-E744FE1222D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{726719E4-4F96-4692-AD64-E744FE1222D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0F83E58-949E-4C91-9279-ECD0CBED972F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0F83E58-949E-4C91-9279-ECD0CBED972F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0F83E58-949E-4C91-9279-ECD0CBED972F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0F83E58-949E-4C91-9279-ECD0CBED972F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{72A9D103-3E86-45FE-AA83-E1B67D02BE57} = {4FAA8273-65C8-45A8-B223-6182FEAFC4FC}
+		{06E91C52-E441-4176-B0A8-0B7355E3AA36} = {4FAA8273-65C8-45A8-B223-6182FEAFC4FC}
+		{E0F83E58-949E-4C91-9279-ECD0CBED972F} = {585EACB5-1A55-461C-AB71-8BA18EEFBCC6}
 	EndGlobalSection
 EndGlobal

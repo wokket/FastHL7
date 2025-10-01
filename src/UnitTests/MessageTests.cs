@@ -1,6 +1,5 @@
 ﻿using FastHl7;
 using JetBrains.dotMemoryUnit;
-using Xunit.Abstractions;
 
 [assembly: DotMemoryUnit(FailIfRunWithoutSupport = false)]
 
