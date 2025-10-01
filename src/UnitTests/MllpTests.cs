@@ -123,7 +123,6 @@ public class MllpTests
         var readTask = reader.ReadMessagesAsync(c =>
         {
             results.Add(c.ToString());
-            return Task.CompletedTask;
         }, token);
 
         await pipe.Writer.CompleteAsync(); // so the reader loop completes
@@ -150,7 +149,7 @@ public class MllpTests
         var results = new List<string>();
         var readTask = reader.ReadMessagesAsync(c =>
         {
-            results.Add(c.ToString());
+            results.Add(c);
             return Task.CompletedTask;
         }, token);
 

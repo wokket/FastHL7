@@ -21,12 +21,25 @@ public readonly ref struct Message
 {
     private readonly Span<Range> _segments;
     private readonly Delimiters _delimiters;
-
+/*
     /// <summary>
     /// 
     /// </summary>
     /// <param name="message">This should be the only place we alloc a string in the lib!</param>
     public Message(string message)
+    {
+        MessageText = message;
+        _delimiters = new(MessageText);
+        _segments = SplitHelper.SplitSegments(MessageText);
+    }
+    */
+
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="message"></param>
+    public Message(ReadOnlySpan<char> message)
     {
         MessageText = message;
         _delimiters = new(MessageText);

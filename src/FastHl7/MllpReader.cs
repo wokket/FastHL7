@@ -1,6 +1,7 @@
 using System.Buffers;
 using System.IO.Pipelines;
 using System.Net;
+using System.Runtime.InteropServices.JavaScript;
 using System.Text;
 
 namespace FastHl7;
@@ -8,7 +9,7 @@ namespace FastHl7;
 /// <summary>
 /// Helper class to parse MLLP-framed messages from a stream or PipeReader.
 /// </summary>
-public class MllpReader: IAsyncDisposable
+public class MllpReader : IAsyncDisposable
 {
     private readonly bool _ourOwnPipeReader;
     private readonly PipeReader _reader;
@@ -40,12 +41,48 @@ public class MllpReader: IAsyncDisposable
 
     /// <summary>
     /// Long-lived loop to read messages from the stream.  This will continue until the stream is closed or the cancellation token is cancelled.
-    /// Each message found will be passed to the given messageHandler delegate for processing.
+    /// Each message found will be passed to the given messageHandler delegate for processing.  Note this overload does NOT accept an async handler as the lightweight ReadOnlySpan cannot survive calls to await.
+    /// If you require an async handler use the overload that returns a String instead, and pay the allocation penalty.
     /// </summary>
-    /// <param name="messageHandler">Delegate to a handler for each message.  The given message must be completely processed prior to returning as buffers may be reused</param>
+    /// <param name="messageHandler">Delegate to a handler for each message.  The given message must be completely processed prior to returning as buffers may be reused.  </param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task ReadMessagesAsync( Func<ReadOnlySpan<char>, Task> messageHandler, CancellationToken cancellationToken = default)
+    public async Task ReadMessagesAsync(Action<ReadOnlySpan<char>> messageHandler,
+        CancellationToken cancellationToken = default)
+    {
+        Task LocalMessageHandler(char[] msg, int count)
+        {
+            messageHandler(msg.AsSpan()[..count]); // synchronous handler
+            return Task.CompletedTask;
+        }
+
+
+        await ReadMessagesAsyncInternal(LocalMessageHandler, cancellationToken);
+    }
+
+    /// <summary>
+    /// Long-lived loop to read messages from the stream.  This will continue until the stream is closed or the cancellation token is cancelled.
+    /// Each message found will be passed to the given messageHandler delegate for processing.  Note this overload does NOT accept an async handler as the lightweight ReadOnlySpan cannot survive calls to await.
+    /// If you require an async handler use the overload that returns a String instead, and pay the allocation penalty.
+    /// </summary>
+    /// <param name="messageHandler">Delegate to a handler for each message.  The given message must be completely processed prior to returning as buffers may be reused.  </param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    public async Task ReadMessagesAsync(Func<string, Task> messageHandler,
+        CancellationToken cancellationToken = default)
+    {
+        Task LocalMessageHandler(char[] msg, int count)
+        {
+            var msgAsString = new String(msg.AsSpan()[..count]);
+            return messageHandler(msgAsString); // asynchronous handler
+        }
+
+        await ReadMessagesAsyncInternal(LocalMessageHandler, cancellationToken);
+    }
+
+
+    private async Task ReadMessagesAsyncInternal(Func<char[], int, Task> handler,
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -64,12 +101,13 @@ public class MllpReader: IAsyncDisposable
                     // Process all messages from the buffer, modifying the input buffer on each iteration.
                     while (TryParseMessage(ref buffer, out var messageBytes))
                     {
-                        var charBuffer = ArrayPool<char>.Shared.Rent((int)messageBytes.Length); // can only be a narrowing operation
+                        var charBuffer =
+                            ArrayPool<char>.Shared.Rent((int)messageBytes.Length); // can only be a narrowing operation
                         var count = Encoding.UTF8.GetChars(messageBytes, charBuffer);
 
                         try
                         {
-                            await messageHandler(charBuffer.AsSpan()[..count]);
+                            await handler(charBuffer, count);
                         }
                         finally
                         {
@@ -126,9 +164,9 @@ public class MllpReader: IAsyncDisposable
         {
             throw new ProtocolViolationException("MLLP stream does not have CR character after FS");
         }
-        
+
         message = buffer.Slice(1, fsPosition.Value);
-        
+
         // Skip the header, message and the two-byte footer
         buffer = buffer.Slice(buffer.GetPosition(1, crPosition));
 
@@ -142,7 +180,7 @@ public class MllpReader: IAsyncDisposable
     public ValueTask DisposeAsync()
     {
         GC.SuppressFinalize(this);
-        
+
         return _ourOwnPipeReader ? _reader.CompleteAsync() : ValueTask.CompletedTask;
     }
 }

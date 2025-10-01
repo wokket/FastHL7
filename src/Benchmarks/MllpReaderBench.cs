@@ -9,13 +9,15 @@ namespace Benchmarks;
 public class MllpReaderBench
 {
     // The Setup just news up the objects, the actual read perf is the diff between the baseline and the ReadMessages bench. 
-    // We read a stream with 100 copies of the same message in it so our amortised allocs are about 13 bytes per message.
+    // We read a stream with 100 copies of the same message in it so our amortised allocs are about 14 bytes per message if we
+    // can get away with a synchronous handler.  If we have to allocate a string for an async handler then that's the price we pay.
 
 /*
-| Method       | Mean        | Ratio  | Gen0   | Allocated | Alloc Ratio |
-|------------- |------------:|-------:|-------:|----------:|------------:|
-| Setup        |    24.24 ns |   1.00 | 0.0162 |     280 B |        1.00 |
-| ReadMessages | 8,279.52 ns | 341.57 | 0.0916 |    1584 B |        5.66 |
+| Method            | Mean         | Ratio  | Gen0   | Gen1   | Allocated | Alloc Ratio |
+|------------------ |-------------:|-------:|-------:|-------:|----------:|------------:|
+| Setup             |     27.30 ns |   1.00 | 0.0162 |      - |     280 B |        1.00 |                                                                                                                                                                                         
+| ReadMessagesSync  |  8,453.29 ns | 309.87 | 0.0916 |      - |    1672 B |        5.97 |
+| ReadMessagesAsync | 14,593.32 ns | 534.94 | 9.5978 | 0.0153 |  165672 B |      591.69 |
  */
 
 
@@ -48,12 +50,22 @@ public class MllpReaderBench
         _reader = new(_memStream);
         // just don't read
     }
-
+    
     [Benchmark] // the actual read perf is the diff between this and the baseline
-    public async Task ReadMessages()
+    public async Task ReadMessagesSync()
     {
         _memStream = new(_bytesToRead);
         _reader = new(_memStream);
-        await _reader.ReadMessagesAsync(c => Task.CompletedTask);
+        await _reader.ReadMessagesAsync(c => { }); // note the ReadOnlySpan overload because the handler is synchronous
     }
+
+    [Benchmark] // the actual read perf is the diff between this and the baseline
+    public async Task ReadMessagesAsync()
+    {
+        _memStream = new(_bytesToRead);
+        _reader = new(_memStream);
+        await _reader.ReadMessagesAsync(c => Task.CompletedTask); // async handler gets a string
+    }
+    
+
 }

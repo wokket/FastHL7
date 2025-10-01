@@ -11,8 +11,10 @@
 					<ModulePath>.*FastHl7.*.dll$</ModulePath>
 				</Include>
 				<Exclude>
+				    <ModulePath>.*samples.*.*$</ModulePath>
 					<ModulePath>.*Coverlet.*.dll$</ModulePath>
 					<ModulePath>.*Benchmarks.*.exe$</ModulePath>
+					<ModulePath>.*Benchmarks.*.dll$</ModulePath>
 				</Exclude>
 			</ModulePaths>
         </CodeCoverage>
