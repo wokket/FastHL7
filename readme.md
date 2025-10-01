@@ -35,10 +35,10 @@ please submit a PR to make it better!
 
 Pretty simple:
 - Add a reference to the [FastHl7 Nuget package](https://www.nuget.org/packages/FastHl7/)
-- Create a message from a string:
+- Create a message from a string (or other `ReadOnlySpan<char>`:
   - ```csharp
     using FastHl7;
-    var message = Message.Parse(hl7MessageString); // Stream/ReadOnlySpan<char> overloads coming soon
+    var message = Message.Parse(hl7MessageString);
     ```
     
 - Query segments, fields etc:
@@ -55,6 +55,9 @@ Pretty simple:
     var noteText = message.Query("NTE.3");
     var unescapedNote = noteText.Unescape();
     ```
+
+# Samples
+There's an example of a high-performance MLLP listener (server) in the [samples](./src/samples/) directory.
 
 # Things to do (in no particular order)
 
@@ -73,7 +76,7 @@ Pretty simple:
 
 
 - Samples: 
-  - [ ] MLLP listener that actually consumes and processes messages to prove out API 
+  - [x] MLLP listener that actually consumes and processes messages to prove out API 
 - [x] Low-alloc DateTime conversion helpers
 
 - [ ] Support MEL.ILogger for places we swallow exceptions etc??
