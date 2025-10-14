@@ -12,7 +12,7 @@ This library aims for the simplicity of HL7-V2, while being strictly modern .Net
 
 It is currently focused on _reading_ messages, not building/writing them, and it makes no attempt to validate messages against the spec.
 
-It aims provides a set of tools for your toolkit, rather than being a fully integrated all-in-one framework, and rewards sparse access
+It aims to provide a set of tools for your toolkit, rather than being a fully integrated all-in-one framework, and rewards sparse access
 to the message structure.  If you need _every single field_ in the message, one of the other libraries may be a better fit, or maybe not.
  
 ## How fast is it?
