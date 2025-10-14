@@ -14,9 +14,9 @@ Aiming to:
 - This library is versioned using [Semantic Versioning](https://semver.org/).
 - Major version number aligns with the version of .Net it targets (eg V9 for .Net 9, V10 for .Net 10 etc).
 - Support for previous versions of .Net effectively terminates when the next major release (targeting the next .Net release) is made.
-  - Security patches may be made to the previous major version, but no new features will be added.
+  - Security patches _may_ be made to the previous major version, but no new features will be added.
 - There is _no_ support for versions of .Net that MS also doesn't support.  
-  - If you're stuck using an old unsupported version of .Net you have my condolences, but just don't take any upgrades... clearly frequent upgrades aren't your forte anyway!
+  - If you're stuck using an old unsupported version of .Net you have my condolences, but just don't take any package updates... clearly frequent upgrades aren't your forte anyway!
 
  
 ## Indexing Questions

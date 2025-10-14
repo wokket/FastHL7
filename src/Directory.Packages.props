@@ -4,6 +4,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.3" />
+    <PackageVersion Include="FastHl7" Version="9.0.1" />
     <PackageVersion Include="HL7-V2" Version="3.6.1" />
     <PackageVersion Include="JetBrains.dotMemoryUnit" Version="3.2.20220510" />
     <PackageVersion Include="nhapi" Version="3.2.4" />

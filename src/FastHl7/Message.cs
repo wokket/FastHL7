@@ -22,19 +22,6 @@ public readonly ref struct Message
 {
     private readonly Span<Range> _segments;
     private readonly Delimiters _delimiters;
-/*
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="message">This should be the only place we alloc a string in the lib!</param>
-    public Message(string message)
-    {
-        MessageText = message;
-        _delimiters = new(MessageText);
-        _segments = SplitHelper.SplitSegments(MessageText);
-    }
-    */
-
 
     /// <summary>
     /// 
@@ -51,6 +38,11 @@ public readonly ref struct Message
     /// The raw HL7 message content underlying this object.
     /// </summary>
     private ReadOnlySpan<char> MessageText { get; }
+
+    /// <summary>
+    /// Gets the delimiters for this message
+    /// </summary>
+    public Delimiters Delimiters => _delimiters;
 
     /// <summary>
     /// Gets the segment at the requested 0-based index (MSH is effectively always 0)
@@ -81,7 +73,7 @@ public readonly ref struct Message
         var repeat = 1; // default to 1, so PID(1) is the same as PID
 
         var parenIndex = name.IndexOf('(');
-        if (parenIndex >= 0 )
+        if (parenIndex >= 0)
         {
             segmentName = name[..parenIndex];
 
@@ -108,8 +100,8 @@ public readonly ref struct Message
 
         return new(); // not found, return empty segment
     }
-    
-    
+
+
     /// <summary>
     /// This takes a dot-delimited query, and returns the raw message text for that query.
     /// eg, Query("MSH") will return the MSH segment text, while Query("PID(2).3.1") will return the 1st component of the third field of the 2nd PID segment.
@@ -123,7 +115,7 @@ public readonly ref struct Message
         {
             return null;
         }
-        
+
         Span<Range> queryParts = stackalloc Range[10];
         var queryPartsCount = SplitHelper.Split(query, '.', queryParts);
 
@@ -132,19 +124,18 @@ public readonly ref struct Message
             throw new ArgumentOutOfRangeException(nameof(query), "Query should have at least one part");
         }
 
-        
+
         // The first part of the query is the segment, possibly with a repeat index
-        
+
         var segment = GetSegment(query[queryParts[0]]);
-        
+
         // just want the segment text, or we couldn't find the segment asked for
-        if (queryPartsCount == 1 || !segment.HasValue) 
+        if (queryPartsCount == 1 || !segment.HasValue)
         {
             return segment.Value;
         }
-        
+
         // Defer to the segment for the remainder of the query
         return segment.Query(query[queryParts[1].Start..]);
     }
-    
 }
