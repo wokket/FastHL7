@@ -10,8 +10,8 @@ namespace Benchmarks;
 /// Benchmark to load and parse a message, then get values from it.
 /// </summary>
 [MemoryDiagnoser]
-[ShortRunJob]
-[HideColumns("BuildConfiguration", "Error", "StdDev", "RatioSD")]
+//[ShortRunJob]
+[HideColumns("BuildConfiguration", "Error", "StdDev", "RatioSD", "Gen0", "Gen1")]
 [SuppressMessage("Performance", "CA1822:Mark members as static")]
 public class ParseMessageBench
 {
@@ -21,12 +21,16 @@ public class ParseMessageBench
     // All benchmarks are flawed in some respect. I've tried to do like-for-like as best I can here, but if I'm being unfair somehow let me know.
 
 /*
-| Method           | Mean         | Ratio  | Gen0    | Gen1    | Allocated | Alloc Ratio |
-|----------------- |-------------:|-------:|--------:|--------:|----------:|------------:|
-| FastHl7          |   1,829.1 ns |   1.00 |  0.0286 |       - |     496 B |        1.00 |                                                                                                                                             
-| Hl7V2            |  26,094.4 ns |  14.27 |  7.5378 |  1.2817 |  130216 B |      262.53 |
-| NHapi_Parser     | 183,373.6 ns | 100.26 | 29.2969 | 12.6953 |  518875 B |    1,046.12 |
-| NaiveStringManip |     426.3 ns |   0.23 |  0.2146 |  0.0010 |    3704 B |        7.47 |
+| Method           | Runtime   | Mean         | Ratio | Allocated | Alloc Ratio |
+|----------------- |---------- |-------------:|------:|----------:|------------:|
+| FastHl7          | .NET 10.0 |   1,796.5 ns |  1.00 |     496 B |        1.00 |                                                                                                                                                     
+| Hl7V2            | .NET 10.0 |  24,370.4 ns | 13.60 |  130088 B |      262.27 |
+| NHapi_Parser     | .NET 10.0 | 171,054.7 ns | 95.43 |  518327 B |    1,045.01 |
+| NaiveStringManip | .NET 10.0 |     377.2 ns |  0.21 |    3704 B |        7.47 |
+| FastHl7          | .NET 9.0  |   1,792.5 ns |  1.00 |     496 B |        1.00 |
+| Hl7V2            | .NET 9.0  |  25,965.7 ns | 14.49 |  130216 B |      262.53 |
+| NHapi_Parser     | .NET 9.0  | 162,944.1 ns | 90.90 |  518875 B |    1,046.12 |
+| NaiveStringManip | .NET 9.0  |     415.6 ns |  0.23 |    3704 B |        7.47 |
 */
 
     private static readonly string _sampleMessage = File.ReadAllText("Sample-Orm.txt");

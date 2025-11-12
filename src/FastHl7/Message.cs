@@ -15,13 +15,14 @@ namespace FastHl7;
 /// Note that this is a ref struct, and so is stack-only.  This is by design to avoid heap allocations and GC pressure.
 /// 
 /// If you need to hold onto a message for longer than the current stack frame, constructing a new <see cref="Message" /> from the
-/// source string is so fast that you should probably store the original string instead.
+/// source data is so fast that you should probably store the original string instead.
 /// </remarks>
 [DebuggerDisplay("{MessageText}")]
 public readonly ref struct Message
 {
     private readonly Span<Range> _segments;
     private readonly Delimiters _delimiters;
+    
 /*
     /// <summary>
     /// 

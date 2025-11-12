@@ -7,18 +7,20 @@ using NHapi.Base.Model.Primitive;
 namespace Benchmarks;
 
 [MemoryDiagnoser]
-[ShortRunJob]
 [SuppressMessage("Performance", "CA1822:Mark members as static")]
-[HideColumns("BuildConfiguration", "Error", "StdDev", "RatioSD")]
+[HideColumns("BuildConfiguration", "Error", "StdDev", "RatioSD", "Gen0", "Gen1")]
 public class DateTimeParseBench
 { 
 
 /*
-| Method                  | Mean      | Ratio | Gen0   | Gen1   | Allocated | Alloc Ratio |
-|------------------------ |----------:|------:|-------:|-------:|----------:|------------:|
-| FastHL7_ParseDateValues |  51.63 ns |  1.00 |      - |      - |         - |          NA |                                                                                                                                            
-| HL7V2_ParseDateValues   | 866.87 ns | 16.79 | 0.1631 | 0.0010 |    2824 B |          NA |
-| NHapi_ParseDateValues   | 169.98 ns |  3.29 | 0.0443 |      - |     768 B |          NA |
+| Method                  | Runtime   | Mean      | Allocated | Alloc Ratio |
+|------------------------ |---------- |----------:|----------:|------------:|
+| FastHL7_ParseDateValues | .NET 10.0 |  44.84 ns |         - |          NA |                                                                                                                               
+| HL7V2_ParseDateValues   | .NET 10.0 | 894.41 ns |    2824 B |          NA |
+| NHapi_ParseDateValues   | .NET 10.0 | 157.23 ns |     768 B |          NA |
+| FastHL7_ParseDateValues | .NET 9.0  |  52.55 ns |         - |          NA |
+| HL7V2_ParseDateValues   | .NET 9.0  | 894.82 ns |    2824 B |          NA |
+| NHapi_ParseDateValues   | .NET 9.0  | 169.71 ns |     768 B |          NA |
 */
 
     // Again, all tests are flawed, but let's try as best we can

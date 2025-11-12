@@ -1,9 +1,10 @@
-﻿using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Running;
-using Benchmarks;
+﻿using BenchmarkDotNet.Running;
 
+// Run using `dotnet run -c release -f net9.0 --runtimes net9.0 net10.0`
 
-BenchmarkRunner.Run<MllpReaderBench>(/*new DebugInProcessConfig()*/);
+BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
+
+//BenchmarkRunner.Run<MllpReaderBench>(/*new DebugInProcessConfig()*/);
 //BenchmarkRunner.Run<MllpWriterBench>(/*new DebugInProcessConfig()*/);
 //BenchmarkRunner.Run<ParseMessageBench>(/*new DebugInProcessConfig()*/);
 //BenchmarkRunner.Run<DateTimeParseBench>(/*new DebugInProcessConfig()*/);

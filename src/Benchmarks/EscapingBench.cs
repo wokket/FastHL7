@@ -15,7 +15,7 @@ namespace Benchmarks;
  */
 
 [MemoryDiagnoser]
-[ShortRunJob]
+//[ShortRunJob]
 [SuppressMessage("Performance", "CA1822:Mark members as static")]
 [HideColumns("BuildConfiguration", "Error", "StdDev", "RatioSD")]
 public class EscapingBench

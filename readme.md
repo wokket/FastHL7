@@ -21,11 +21,11 @@ There's a set of benchmarks in the [Benchmarks](./src/Benchmarks) directory, but
 
 To parse a fully featured message and query some data: 
 ```
-| Method       | Mean       | Ratio  | Gen0    | Gen1    | Allocated | Alloc Ratio |
-|------------- |-----------:|-------:|--------:|--------:|----------:|------------:|
-| FastHl7      |   1.620 us |   1.00 |  0.0153 |       - |     288 B |        1.00 |                                                                                                                                                                                                                                        
-| Hl7V2        |  25.401 us |  15.68 |  7.4463 |  1.2817 |  128696 B |      446.86 |
-| NHapi_Parser | 172.307 us | 106.38 | 29.2969 | 12.6953 |  518875 B |    1,801.65 |
+| Method           | Runtime   | Mean         | Ratio | Allocated | Alloc Ratio |
+|----------------- |---------- |-------------:|------:|----------:|------------:|
+| FastHl7          | .NET 10.0 |   1,796.5 ns |  1.00 |     496 B |        1.00 |                                                                                                                                                     
+| Hl7V2            | .NET 10.0 |  24,370.4 ns | 13.60 |  130088 B |      262.27 |
+| NHapi_Parser     | .NET 10.0 | 171,054.7 ns | 95.43 |  518327 B |    1,045.01 |
 ```
 
 As noted over there it's difficult to do a truly apples-apples comparisons of some features, but if you think a benchmark is unfair/misleading then 
