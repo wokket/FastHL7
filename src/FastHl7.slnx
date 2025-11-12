@@ -1,0 +1,24 @@
+<Solution>
+  <Folder Name="/Samples/">
+    <Project Path="samples/SocketReader/SocketReader.csproj" />
+  </Folder>
+  <Folder Name="/SolutionItems/">
+    <File Path="../global.json" />
+    <File Path="../readme.md" />
+    <File Path=".editorconfig" />
+    <File Path="CodeCoverage.runsettings" />
+    <File Path="Directory.Packages.props" />
+  </Folder>
+  <Folder Name="/SolutionItems/.github/">
+    <File Path="../.github/dependabot.yml" />
+    <File Path="../.github/workflows/ci.yml" />
+    <File Path="../.github/workflows/codeql.yml" />
+    <File Path="../.github/workflows/publish.yml" />
+  </Folder>
+  <Folder Name="/SolutionItems/docs/">
+    <File Path="../docs/design-notes.md" />
+  </Folder>
+  <Project Path="Benchmarks/Benchmarks.csproj" />
+  <Project Path="FastHl7/FastHl7.csproj" />
+  <Project Path="UnitTests/UnitTests.csproj" />
+</Solution>
