@@ -65,6 +65,28 @@ public class MllpWriter : IAsyncDisposable
         return !flushResult.IsCompleted;
     }
 
+    private static readonly byte[] _simpleAck = [0x0B,0x06,0x1C,0x0D];
+    private static readonly byte[] _simpleNak = [0x0B,0x15,0x1C,0x0D];
+    /// <summary>
+    /// Sends a MllpV2 simple ACK (0x06)
+    /// </summary>
+    /// <returns></returns>
+    public async Task<bool> SendSimpleAck()
+    {
+        var result = await _writer.WriteAsync(_simpleAck);
+        return !result.IsCompleted;
+    }
+    
+    /// <summary>
+    /// Sends a MllpV2 simple NAK (0x15)
+    /// </summary>
+    /// <returns></returns>
+    public async Task<bool> SendSimpleNak()
+    {
+        var result = await _writer.WriteAsync(_simpleAck);
+        return !result.IsCompleted;
+    }
+
     /// <summary>
     /// Asynchronously dispose of this writer, completing the underlying PipeWriter if needed.
     /// </summary>
