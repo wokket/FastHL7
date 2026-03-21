@@ -3,18 +3,20 @@ using BenchmarkDotNet.Attributes;
 namespace Benchmarks;
 
 [MemoryDiagnoser]
-[ShortRunJob]
 [HideColumns("BuildConfiguration", "Error", "StdDev", "RatioSD")]
 public class QueryBench
 {
 /*
-| Method                    | Mean     | Ratio | Gen0   | Allocated | Alloc Ratio |
-|-------------------------- |---------:|------:|-------:|----------:|------------:|
-| FastHl7_ConstructOnly     | 3.999 us |  1.00 | 0.0076 |     176 B |        1.00 |
-| FastHl7_ConstructAndQuery | 4.808 us |  1.20 | 0.0610 |    1000 B |        5.68 |
-| Hl7V2_QueryOnly           | 2.442 us |  0.61 | 0.3052 |    4824 B |       27.41 |
+| Method                    | Job       | Runtime   | Mean     | Ratio | Gen0   | Allocated | Alloc Ratio |
+|-------------------------- |---------- |---------- |---------:|------:|-------:|----------:|------------:|
+| FastHl7_ConstructOnly     | .NET 10.0 | .NET 10.0 | 3.907 us |  1.01 | 0.0076 |     176 B |        1.00 |                                                                                                                              
+| FastHl7_ConstructAndQuery | .NET 10.0 | .NET 10.0 | 4.807 us |  1.25 | 0.0610 |    1000 B |        5.68 |
+| Hl7V2_QueryOnly           | .NET 10.0 | .NET 10.0 | 2.460 us |  0.64 | 0.3052 |    4824 B |       27.41 |
+| FastHl7_ConstructOnly     | .NET 9.0  | .NET 9.0  | 3.860 us |  1.00 | 0.0076 |     176 B |        1.00 |
+| FastHl7_ConstructAndQuery | .NET 9.0  | .NET 9.0  | 4.704 us |  1.22 | 0.0610 |    1000 B |        5.68 |
+| Hl7V2_QueryOnly           | .NET 9.0  | .NET 9.0  | 2.526 us |  0.65 | 0.3052 |    4824 B |       27.41 |
 
-Real cost of FastHL7 Query in this case is 0.809us/824b
+Real cost of FastHL7 Query on Net10 in this case is 0.9us/824b
 */
 
 
