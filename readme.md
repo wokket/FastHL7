@@ -21,11 +21,11 @@ There's a set of benchmarks in the [Benchmarks](./src/Benchmarks) directory, but
 
 To parse a fully featured message and query some data: 
 ```
-| Method           | Runtime   | Mean         | Ratio | Allocated | Alloc Ratio |
-|----------------- |---------- |-------------:|------:|----------:|------------:|
-| FastHl7          | .NET 10.0 |   1,796.5 ns |  1.00 |     496 B |        1.00 |                                                                                                                                                     
-| Hl7V2            | .NET 10.0 |  24,370.4 ns | 13.60 |  130088 B |      262.27 |
-| NHapi_Parser     | .NET 10.0 | 171,054.7 ns | 95.43 |  518327 B |    1,045.01 |
+| Method       | Runtime   | Mean         | Ratio  | Allocated | Alloc Ratio |
+|--------------|---------- |-------------:|-------:|----------:|------------:|
+| FastHl7      | .NET 10.0 |   2,030.3 ns |   1.00 |     496 B |        1.00 |                                                                                                                                           
+| Hl7V2        | .NET 10.0 |  26,223.7 ns |  12.87 |  102128 B |      205.90 |
+| NHapi_Parser | .NET 10.0 | 224,668.9 ns | 110.27 |  518290 B |    1,044.94 |
 ```
 
 As noted over there it's difficult to do a truly apples-apples comparisons of some features, but if you think a benchmark is unfair/misleading then 
@@ -65,8 +65,9 @@ There's an example of a high-performance MLLP listener (server) in the [samples]
 - [x] Support for Components (`^`)
 - [x] and Sub-Components (`&`)
 - [x] Support for Repeating fields (`~`)
+- [ ] [Support for `ADD` segments](https://www.hl7.eu/HL7v2x/v24/std24/ch02.htm#Heading374) (I've never seen these in the wild)
 
-- Querying (this whole space needs some cleaning up)
+- Querying
   - [x] Allow fetch of segments by index
   - [x] Allow fetch of segments by name/ordinal (`message.GetSegment("PID")`)
     - [x] Allow fetch of segments by name/ordinal with index (`message.GetSegment("PID(2)")`) for repeating segments
@@ -80,7 +81,7 @@ There's an example of a high-performance MLLP listener (server) in the [samples]
 - [x] Low-alloc DateTime conversion helpers
 
 - [ ] Support MEL.ILogger for places we swallow exceptions etc??
-- [x] Nuget when vaguely ready
+- [x] [Nuget library](https://www.nuget.org/packages/FastHl7))
  
 - [x] Escape sequences for delimiter chars (https://docs.intersystems.com/latest/csp/docbook/DocBook.UI.Page.cls?KEY=EHL72_escape_sequences)
   - [x] Hex char support via Hex Encoding (0xA2) (https://web.archive.org/web/20160422163547/https://corepointhealth.com/resource-center/hl7-resources/hl7-escape-sequences)

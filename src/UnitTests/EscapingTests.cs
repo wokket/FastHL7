@@ -31,6 +31,7 @@ public class EscapingTests
     [InlineData(@"\F\ Leading", @"| Leading")]
     [InlineData(@"T\XC3A4\glich 1 Tablette oral einnehmen\E\day \H\ONLY\N\ if tests > 10\S\9/l. ", @"Täglich 1 Tablette oral einnehmen\day \H\ONLY\N\ if tests > 10^9/l. ")]
     [InlineData(@"Cost 99\T\#162;", "Cost 99¢")] // Embedded Html Encoded char
+    [InlineData(@"\X09\", "\t")] //From Hl7V2 #40
     [Theory]
     public void TestDeEscapingDefaultDelims(string input, string expected)
     {
