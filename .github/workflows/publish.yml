@@ -27,7 +27,7 @@ jobs:
         filter: tree:0 # better perf
   
     - name: Setup .NET
-      uses: actions/setup-dotnet@v5
+      uses: actions/setup-dotnet@v6
     
     - name: Create NuGet package
       run: dotnet pack src/FastHl7/FastHl7.csproj -c Release  --output ${{ env.NuGetDirectory }}
@@ -49,7 +49,7 @@ jobs:
     steps:
       # Install the .NET SDK indicated in the global.json file
       - name: Setup .NET
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
       
       # Download the NuGet package created in the previous job
       - uses: actions/download-artifact@v8
@@ -90,7 +90,7 @@ jobs:
       
       # Install the .NET SDK indicated in the global.json file
       - name: Setup .NET Core
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
           
       # Get a short-lived NuGet API key (Trusted Publishing https://learn.microsoft.com/en-us/nuget/nuget-org/trusted-publishing)
       - name: NuGet login (OIDC → temp API key)
