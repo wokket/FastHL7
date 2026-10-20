@@ -13,14 +13,12 @@ public class DateTimeParseBench
 { 
 
 /*
-| Method                  | Runtime   | Mean      | Allocated | Alloc Ratio |
-|------------------------ |---------- |----------:|----------:|------------:|
-| FastHL7_ParseDateValues | .NET 10.0 |  44.84 ns |         - |          NA |                                                                                                                               
-| HL7V2_ParseDateValues   | .NET 10.0 | 894.41 ns |    2824 B |          NA |
-| NHapi_ParseDateValues   | .NET 10.0 | 157.23 ns |     768 B |          NA |
-| FastHL7_ParseDateValues | .NET 9.0  |  52.55 ns |         - |          NA |
-| HL7V2_ParseDateValues   | .NET 9.0  | 894.82 ns |    2824 B |          NA |
-| NHapi_ParseDateValues   | .NET 9.0  | 169.71 ns |     768 B |          NA |
+| Method                  | Mean      | Ratio | Allocated | Alloc Ratio |
+|------------------------ |----------:|------:|----------:|------------:|
+| FastHL7_ParseDateValues |  53.57 ns |  1.00 |         - |          NA |                                                                                                                                                                                
+| HL7V2_ParseDateValues   | 568.29 ns | 10.61 |    2712 B |          NA |
+| NHapi_ParseDateValues   | 160.36 ns |  2.99 |     768 B |          NA |
+
 */
 
     // Again, all tests are flawed, but let's try as best we can

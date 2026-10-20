@@ -6,12 +6,12 @@ using FastHl7;
 namespace Benchmarks;
 
 /*
-| Method           | Mean      | Ratio | Gen0   | Allocated | Alloc Ratio |
-|----------------- |----------:|------:|-------:|----------:|------------:|
-| FastHL7_NoEscape |  11.20 ns |  0.10 |      - |         - |        0.00 |
-| Hl7V2_NoEscape   |  10.83 ns |  0.10 |      - |         - |        0.00 |
-| FastHL7_Escape   | 109.93 ns |  1.00 | 0.0122 |     192 B |        1.00 |
-| Hl7V2_Escape     | 207.07 ns |  1.88 | 0.0677 |    1064 B |        5.54 
+| Method           | Mean       | Ratio | Gen0   | Allocated | Alloc Ratio |
+|----------------- |-----------:|------:|-------:|----------:|------------:|
+| FastHL7_NoEscape |   7.308 ns |  0.06 |      - |         - |        0.00 |                                                                                                                                                                             
+| Hl7V2_NoEscape   |   7.815 ns |  0.06 |      - |         - |        0.00 |
+| FastHL7_Escape   | 121.184 ns |  1.00 | 0.0458 |     192 B |        1.00 |
+| Hl7V2_Escape     | 202.582 ns |  1.67 | 0.2544 |    1064 B |        5.54 |
  */
 
 [MemoryDiagnoser]
