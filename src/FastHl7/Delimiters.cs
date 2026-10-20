@@ -53,3 +53,16 @@ public readonly struct Delimiters
     /// </summary>
     public char FieldDelimiter { get; }
 }
+
+public static class DelimiterExtensions
+{
+    /// <summary>
+    /// Get delimiters from an input span
+    /// </summary>
+    /// <param name="message"></param>
+    /// <returns></returns>
+    public static Delimiters GetDelimiters(this ReadOnlySpan<char> message)
+    {
+        return new Delimiters(message);
+    }
+}

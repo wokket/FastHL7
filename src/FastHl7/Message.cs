@@ -147,5 +147,16 @@ public readonly ref struct Message
         // Defer to the segment for the remainder of the query
         return segment.Query(query[queryParts[1].Start..]);
     }
+
+    /// <summary>
+    /// Gets the delimiters used for this message
+    /// </summary>
+    public Delimiters Delimiters
+    {
+        get
+        {
+            return _delimiters;
+        }
+    }
     
 }
