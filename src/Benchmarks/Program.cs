@@ -1,6 +1,10 @@
 ﻿using BenchmarkDotNet.Running;
 
-// Run using `dotnet run -c release -f net9.0 --runtimes net9.0 net10.0`
+// Run benchmarks on each target framework with `dotnet run -c Release -f <tfm>`.
+// For net11.0 Mllp comparisons, run once normally (RuntimeAsyncOn), then run:
+// `dotnet build -c Release -f net11.0 -p:UseRuntimeAsync=false`
+// `dotnet run -c Release -f net11.0 --no-build` (RuntimeAsyncOff).
+// The net11.0 variants use BenchmarkDotNet's in-process toolchain because 0.15.8 doesn't recognize .NET 11.
 
 BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
 

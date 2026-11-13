@@ -8,8 +8,8 @@ using FastHl7;
 namespace Benchmarks;
 
 [MemoryDiagnoser]
-[ShortRunJob]
 [HideColumns("BuildConfiguration", "Error", "StdDev", "RatioSD")]
+[Config(typeof(RuntimeAsyncConfig))]
 public class MllpReaderBench
 {
     // The Setup just news up the objects, the actual read perf is the diff between the baseline and the ReadMessages bench. 
@@ -27,7 +27,7 @@ public class MllpReaderBench
 
 
     private MemoryStream _memStream = new();
-    private readonly string _message = File.ReadAllText("Sample-ORM.txt");
+    private readonly string _message = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Sample-ORM.txt"));
     private byte[] _bytesToRead = [];
     private MllpReader _reader = null!;
     private MllpSequenceReader _sequenceReader = null!;
