@@ -10,7 +10,7 @@ namespace Benchmarks;
 /// Benchmark to load and parse a message, then get values from it.
 /// </summary>
 [MemoryDiagnoser]
-//[ShortRunJob]
+//[Config(typeof(RuntimeAsyncConfig))]
 [HideColumns("BuildConfiguration", "Error", "StdDev", "RatioSD", "Gen0", "Gen1")]
 [SuppressMessage("Performance", "CA1822:Mark members as static")]
 public class ParseMessageBench
