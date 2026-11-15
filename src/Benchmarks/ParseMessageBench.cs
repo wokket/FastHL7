@@ -1,7 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using BenchmarkDotNet.Attributes;
 using NHapi.Base.Parser;
-using NHapi.Base.Util;
 using NHapi.Model.V23.Message;
 
 namespace Benchmarks;
@@ -10,7 +9,6 @@ namespace Benchmarks;
 /// Benchmark to load and parse a message, then get values from it.
 /// </summary>
 [MemoryDiagnoser]
-//[Config(typeof(RuntimeAsyncConfig))]
 [HideColumns("BuildConfiguration", "Error", "StdDev", "RatioSD", "Gen0", "Gen1")]
 [SuppressMessage("Performance", "CA1822:Mark members as static")]
 public class ParseMessageBench

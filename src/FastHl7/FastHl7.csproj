@@ -1,11 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <LangVersion>latestmajor</LangVersion>
         <IsAotCompatible>true</IsAotCompatible>
-        <TargetFrameworks>net10.0;net11.0</TargetFrameworks>
+        <!-- Fails build if referenced NuGet packages aren't marked trimmable -->
+        <VerifyReferenceTrimCompatibility>true</VerifyReferenceTrimCompatibility>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(TargetFramework)' == 'net11.0' and '$(UseRuntimeAsync)' != 'false'">
