@@ -23,9 +23,9 @@ To parse a fully featured message and query some data:
 ```
 | Method           | Mean         | Ratio  | Allocated | Alloc Ratio |
 |----------------- |-------------:|-------:|----------:|------------:|
-| FastHl7          |   1,788.9 ns |   1.00 |     496 B |        1.00 |                                                                                                                                                                                   
-| Hl7V2            |  24,460.7 ns |  13.68 |   93225 B |      187.95 |
-| NHapi_Parser     | 337,500.4 ns | 188.72 |  517539 B |    1,043.43 |
+| FastHl7          |     569.0 ns |   1.00 |         - |          NA |
+| Hl7V2            |  25,230.7 ns |  44.34 |   93200 B |          NA |
+| NHapi_Parser     | 158,556.5 ns | 278.65 |  516763 B |          NA |
 ```
 
 As noted over there it's difficult to do a truly apples-apples comparisons of some features, but if you think a benchmark is unfair/misleading then 
@@ -38,7 +38,7 @@ Pretty simple:
 - Create a message from a string (or other `ReadOnlySpan<char>`:
   - ```csharp
     using FastHl7;
-    var message = Message.Parse(hl7MessageString);
+    var message = new Message(hl7MessageString);
     ```
     
 - Query segments, fields etc:

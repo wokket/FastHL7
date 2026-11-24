@@ -10,7 +10,6 @@ namespace FastHl7;
 public ref struct Field
 {
     private readonly Delimiters _delimiters;
-    private Range[]? _components;
 
     /// <summary>
     /// Construct a new field from the given value and delimiters.
@@ -21,15 +20,6 @@ public ref struct Field
     {
         Value = value;
         _delimiters = delimiters;
-    }
-
-    private Range[] Components
-    {
-        get
-        {
-            _components ??= SplitHelper.Split(Value, _delimiters.ComponentDelimiter);
-            return _components;
-        }
     }
 
     /// <summary>
@@ -58,8 +48,8 @@ public ref struct Field
     {
         get
         {
-            
-            return Components.Length;
+            var value = FirstRepeat;
+            return SplitHelper.CountParts(value, _delimiters.ComponentDelimiter);
         }
     }
 
@@ -72,12 +62,12 @@ public ref struct Field
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public ReadOnlySpan<char> GetComponent(int i)
     {
-        if (Components.Length < i || i < 1)
+        if (i < 1 || !SplitHelper.TryGetPart(FirstRepeat, _delimiters.ComponentDelimiter, i - 1, out var component))
         {
             throw new ArgumentOutOfRangeException(nameof(i), "Component index is out of range.");
         }
     
-        return Value[Components[i - 1]];
+        return component;
     }
 
 
@@ -99,51 +89,50 @@ public ref struct Field
             return null;
         }
 
-        Span<Range> queryParts = stackalloc Range[10];
-        var queryPartsCount = SplitHelper.Split(query, '.', queryParts);
-
-        if (queryPartsCount == 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(query), "Query should have at least one part");
-        }
-
-        if (!int.TryParse(query[queryParts[0]], out var componentIndex))
+        var separatorIndex = query.IndexOf('.');
+        var componentQuery = separatorIndex < 0 ? query : query[..separatorIndex];
+        if (!int.TryParse(componentQuery, out var componentIndex) || componentIndex < 1)
         {
             throw new ArgumentOutOfRangeException(nameof(query), "Unable to parse componentIndex");
         }
 
-        var valueToQuery = Value;
-        if (Value.Contains(_delimiters.RepeatDelimiter)) // Field has multiple repeats but user didn't query a specific one - default to first repeat
+        if (!SplitHelper.TryGetPart(FirstRepeat, _delimiters.ComponentDelimiter, componentIndex - 1, out var valueToReturn))
         {
-            valueToQuery = valueToQuery[..valueToQuery.IndexOf(_delimiters.RepeatDelimiter)];
+            throw new ArgumentOutOfRangeException(nameof(query), "Requested component not found in field");
         }
 
-        Span<Range> components = stackalloc Range[10];
-        _ = SplitHelper.Split(valueToQuery, _delimiters.ComponentDelimiter, components);
-        
-        var valueToReturn = Value[components[componentIndex - 1]]; // -1 for 1-based indexing like Hl7V2
-
-        if (queryPartsCount == 1)
+        if (separatorIndex < 0)
         {
             return valueToReturn; // nothing else to do
         }
 
         // we have a subcomponent
-        if (!int.TryParse(query[queryParts[1]], out var subComponentIndex))
+        var subComponentQuery = query[(separatorIndex + 1)..];
+        var nextSeparatorIndex = subComponentQuery.IndexOf('.');
+        if (nextSeparatorIndex >= 0)
+        {
+            subComponentQuery = subComponentQuery[..nextSeparatorIndex];
+        }
+
+        if (!int.TryParse(subComponentQuery, out var subComponentIndex) || subComponentIndex < 1)
         {
             throw new ArgumentOutOfRangeException(nameof(query), "Unable to parse subComponentIndex");
         }
 
-        Span<Range> subComps = stackalloc Range[10];
-        var subCompCount = SplitHelper.Split(valueToReturn, _delimiters.SubComponentDelimiter, subComps);
-
-        if (subCompCount < subComponentIndex)
+        if (!SplitHelper.TryGetPart(valueToReturn, _delimiters.SubComponentDelimiter, subComponentIndex - 1, out var subComponent))
         {
             throw new ArgumentOutOfRangeException(nameof(query), "Requested subcomponent not found in component");
         }
 
-        valueToReturn = valueToReturn[subComps[subComponentIndex - 1]];
+        return subComponent;
+    }
 
-        return valueToReturn;
+    private ReadOnlySpan<char> FirstRepeat
+    {
+        get
+        {
+            var repeatIndex = Value.IndexOf(_delimiters.RepeatDelimiter);
+            return repeatIndex < 0 ? Value : Value[..repeatIndex];
+        }
     }
 }

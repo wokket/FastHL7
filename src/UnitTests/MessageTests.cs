@@ -52,10 +52,20 @@ public class MessageTests
             _ = hl7Message.GetSegment(3);
             Assert.Fail("We shouldn't have got here");
         }
+
         catch (ArgumentOutOfRangeException)
         {
             // we're good 
         }
+    }
+
+    [Fact]
+    public void TestGetSegmentBeyondInitialSplitBuffer()
+    {
+        var text = "MSH|^~\\&\n" + string.Join('\n', Enumerable.Repeat("ZZZ|value", 1030));
+        var message = new Message(text);
+
+        Assert.Equal("ZZZ|value", message.GetSegment(1030).Value);
     }
 
     [Fact]

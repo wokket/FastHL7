@@ -44,6 +44,7 @@ public class SegmentTests
             _ = segment.GetField(13);
             Assert.Fail("We shouldn't have got here");
         }
+
         catch (ArgumentOutOfRangeException)
         {
             // we're good 
@@ -75,6 +76,17 @@ public class SegmentTests
         {
             // we're good 
         }
+    }
+
+    [Fact]
+    public void TestGetFieldBeyondInitialSplitBuffer()
+    {
+        const string msh = "MSH|^~\\&";
+        var delimiters = new Delimiters(msh);
+        var text = "PID" + string.Concat(Enumerable.Repeat("|x", 1030));
+        var segment = new Segment(text, delimiters);
+
+        Assert.Equal("x", segment.GetField(1030).Value);
     }
 
     [Fact]

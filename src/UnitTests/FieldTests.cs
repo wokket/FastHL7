@@ -52,4 +52,26 @@ public class FieldTests
         
         
     }
+
+    [Theory]
+    [InlineData("0")]
+    [InlineData("-1")]
+    [InlineData("3")]
+    [InlineData("1.0")]
+    [InlineData("1.-1")]
+    [InlineData("1.2")]
+    public void QueryRejectsOutOfRangeComponentOrSubComponent(string query)
+    {
+        const string text = "MSH|^~\\&";
+        var field = new Field("A^B", new Delimiters(text));
+
+        try
+        {
+            _ = field.Query(query);
+            Assert.Fail("Expected an out-of-range query to throw.");
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+        }
+    }
 }

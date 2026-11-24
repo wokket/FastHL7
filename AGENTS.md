@@ -1,5 +1,11 @@
 # FastHL7 repository instructions
 
+## General
+- Use Australian English
+- Preference performance and efficiency of code where able, if this impacts readability then confirm with the caller.
+- Maintain a very level of code coverage, if looking at a known bug then write a failing test first.
+- This will be hosted in security critical infrastructure, maintain the highest standards of code/data security.
+
 ## Build and test
 
 - The repository uses the SDK pinned in `global.json` (`11.0.100`, with patch roll-forward).
@@ -15,7 +21,7 @@
 - For a whole test class:
   - `dotnet run --project src/UnitTests/UnitTests.csproj -c Release -- --filter-class UnitTests.QueryTests`
 - The tests also support coverage/report flags used by CI: `dotnet test -c Release --no-build --report-xunit-trx --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml`, run from `src/UnitTests`.
-- No separate lint or formatting command is configured. Formatting and analyzer behavior comes from `src/.editorconfig` and the normal build.
+- No separate lint or formatting command is configured. Formatting and analyzer behaviour comes from `src/.editorconfig` and the normal build.
 - BenchmarkDotNet benchmarks are not unit tests:
   - `dotnet run --project src/Benchmarks/Benchmarks.csproj -c Release -f net11.0`
 

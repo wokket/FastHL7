@@ -20,22 +20,7 @@ namespace FastHl7;
 [DebuggerDisplay("{MessageText}")]
 public readonly ref struct Message
 {
-    private readonly Span<Range> _segments;
     private readonly Delimiters _delimiters;
-    
-/*
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="message">This should be the only place we alloc a string in the lib!</param>
-    public Message(string message)
-    {
-        MessageText = message;
-        _delimiters = new(MessageText);
-        _segments = SplitHelper.SplitSegments(MessageText);
-    }
-    */
-
 
     /// <summary>
     /// 
@@ -45,7 +30,6 @@ public readonly ref struct Message
     {
         MessageText = message;
         _delimiters = new(MessageText);
-        _segments = SplitHelper.SplitSegments(MessageText);
     }
 
     /// <summary>
@@ -61,12 +45,21 @@ public readonly ref struct Message
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public Segment GetSegment(int i)
     {
-        if (_segments.Length <= i || i < 0)
+        if (i < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(i), "Segment index is out of range.");
         }
 
-        return new(MessageText[_segments[i]], _delimiters);
+        var position = 0;
+        for (var index = 0; SplitHelper.TryGetNextSegment(MessageText, ref position, out var range); index++)
+        {
+            if (index == i)
+            {
+                return new(MessageText[range], _delimiters);
+            }
+        }
+
+        throw new ArgumentOutOfRangeException(nameof(i), "Segment index is out of range.");
     }
 
     /// <summary>
@@ -94,14 +87,16 @@ public readonly ref struct Message
         }
 
         var foundCount = 0;
-        foreach (var segment in _segments)
+        var position = 0;
+        while (SplitHelper.TryGetNextSegment(MessageText, ref position, out var range))
         {
-            if (!MessageText[segment].StartsWith(segmentName, StringComparison.OrdinalIgnoreCase))
+            var segment = MessageText[range];
+            if (!segment.StartsWith(segmentName, StringComparison.OrdinalIgnoreCase))
                 continue; // not our segment name
 
             if (foundCount + 1 == repeat) // +1 so we get 1-based indexing
             {
-                return new(MessageText[segment], _delimiters);
+                return new(segment, _delimiters);
             }
 
             foundCount++;
@@ -124,28 +119,20 @@ public readonly ref struct Message
         {
             return null;
         }
-        
-        Span<Range> queryParts = stackalloc Range[10];
-        var queryPartsCount = SplitHelper.Split(query, '.', queryParts);
 
-        if (queryPartsCount == 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(query), "Query should have at least one part");
-        }
-
-        
         // The first part of the query is the segment, possibly with a repeat index
-        
-        var segment = GetSegment(query[queryParts[0]]);
+        var separatorIndex = query.IndexOf('.');
+        var segmentQuery = separatorIndex < 0 ? query : query[..separatorIndex];
+        var segment = GetSegment(segmentQuery);
         
         // just want the segment text, or we couldn't find the segment asked for
-        if (queryPartsCount == 1 || !segment.HasValue) 
+        if (separatorIndex < 0 || !segment.HasValue)
         {
             return segment.Value;
         }
         
         // Defer to the segment for the remainder of the query
-        return segment.Query(query[queryParts[1].Start..]);
+        return segment.Query(query[(separatorIndex + 1)..]);
     }
 
     /// <summary>

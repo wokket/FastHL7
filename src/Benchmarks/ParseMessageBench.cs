@@ -21,10 +21,10 @@ public class ParseMessageBench
 /*
 | Method           | Mean         | Ratio  | Allocated | Alloc Ratio |
 |----------------- |-------------:|-------:|----------:|------------:|
-| FastHl7          |   1,788.9 ns |   1.00 |     496 B |        1.00 |                                                                                                                                                                                   
-| Hl7V2            |  24,460.7 ns |  13.68 |   93225 B |      187.95 |
-| NHapi_Parser     | 337,500.4 ns | 188.72 |  517539 B |    1,043.43 |
-| NaiveStringManip |     407.9 ns |   0.23 |    3704 B |        7.47 |
+| FastHl7          |     569.0 ns |   1.00 |         - |          NA |
+| Hl7V2            |  25,230.7 ns |  44.34 |   93200 B |          NA |
+| NHapi_Parser     | 158,556.5 ns | 278.65 |  516763 B |          NA |
+| NaiveStringManip |     591.6 ns |   1.04 |    3704 B |          NA |
 
 */
 

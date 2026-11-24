@@ -95,5 +95,14 @@ public class QueryTests
         
     }
 
+    [Fact]
+    public void QueryCanSelectRepeatsBeyondInitialStackBuffer()
+    {
+        var repeats = string.Join('~', Enumerable.Range(1, 25));
+        var message = new Message($"MSH|^~\\&\nPID|{repeats}");
+
+        Assert.Equal("25", message.Query("PID.1(25)"));
+    }
+
 
 }

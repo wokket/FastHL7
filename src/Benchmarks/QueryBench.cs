@@ -1,4 +1,5 @@
 using BenchmarkDotNet.Attributes;
+using System.Runtime.CompilerServices;
 
 namespace Benchmarks;
 
@@ -17,21 +18,19 @@ public class QueryBench
 | Hl7V2_QueryOnly           | .NET 9.0  | .NET 9.0  | 2.526 us |  0.65 | 0.3052 |    4824 B |       27.41 |
 
 Real cost of FastHL7 Query on Net10 in this case is 0.9us/824b
+
 */
 
 
-    private static readonly Efferent.HL7.V2.Message _hl7V2Message = new(_message);
-
-    static QueryBench()
-    {
-        _hl7V2Message.ParseMessage(true);
-    }
-
     [Benchmark(Baseline = true)]
-    public void FastHl7_ConstructOnly()
+    public char FastHl7_ConstructOnly()
     {
-        _ = new FastHl7.Message(_message);
+        var message = CreateMessage(_message);
+        return message.Delimiters.FieldDelimiter;
     }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private static FastHl7.Message CreateMessage(string text) => new(text);
 
     [Benchmark]
     public void FastHl7_ConstructAndQuery()
@@ -82,7 +81,7 @@ Real cost of FastHL7 Query on Net10 in this case is 0.9us/824b
     }
 
 
-    private const string _message =
+    private static readonly string _message =
         """
         MSH|^~\&|SendingApp|SendingFac|ReceivingApp|ReceivingFac|20120411070545||ORU^R01|59689|P|2.3
         PID|1|12345|12345^^^MIE&1.2.840.114398.1.100&ISO^MR||MOUSE^MINNIE^S||19240101|F|||123 MOUSEHOLE LN^^FORT WAYNE^IN^46808|||||||||||||||||||
@@ -104,4 +103,11 @@ Real cost of FastHL7 Query on Net10 in this case is 0.9us/824b
         OBX|13|NM|mchc^Mchc||32|g/dl|32-35||||F|||20120410160227|lab|12^XYZ LAB|
         OBX|14|NM|plt^Platelets||221|/nl|140-400||||F|||20120410160227|lab|12^XYZ LAB|
         """;
+
+    private static readonly Efferent.HL7.V2.Message _hl7V2Message = new(_message);
+
+    static QueryBench()
+    {
+        _hl7V2Message.ParseMessage(true);
+    }
 }

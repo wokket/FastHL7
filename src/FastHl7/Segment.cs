@@ -10,14 +10,11 @@ namespace FastHl7;
 public readonly ref struct Segment
 {
     private readonly Delimiters _delimiters;
-    private readonly Range[] _fields;
 
     internal Segment(ReadOnlySpan<char> value, Delimiters delimiters)
     {
         Value = value;
         _delimiters = delimiters;
-
-        _fields = SplitHelper.Split(value, _delimiters.FieldDelimiter);
     }
 
     /// <summary>
@@ -42,12 +39,13 @@ public readonly ref struct Segment
     {
         get
         {
+            var fieldCount = SplitHelper.CountParts(Value, _delimiters.FieldDelimiter);
             if (Name.Equals("MSH", StringComparison.OrdinalIgnoreCase))
             {
                 // MSH is a special cat, field 1 is the field delim char, and field 2 the remainder of the encoding chars
-                return _fields.Length + 1; // offset by one
+                return fieldCount + 1; // offset by one
             }
-            return _fields.Length;
+            return fieldCount;
         }
     }
 
@@ -60,30 +58,35 @@ public readonly ref struct Segment
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public Field GetField(int i)
     {
-        if (FieldCount <= i || i < 0)
+        if (i < 0)
         {
             throw new ArgumentOutOfRangeException(nameof(i), "Field index is out of range.");
         }
         
-        if (!Name.Equals("MSH", StringComparison.OrdinalIgnoreCase))
+        if (Name.Equals("MSH", StringComparison.OrdinalIgnoreCase))
         {
-            return new(Value[_fields[i]], _delimiters);
+            if (i == 1)
+            {
+                return new(Value.Slice(3, 1), _delimiters);
+            }
+
+            if (i >= 2)
+            {
+                if (!SplitHelper.TryGetPart(Value, _delimiters.FieldDelimiter, i - 1, out var mshField))
+                {
+                    throw new ArgumentOutOfRangeException(nameof(i), "Field index is out of range.");
+                }
+
+                return new(mshField, _delimiters);
+            }
         }
 
-        // MSH is a special cat, field 1 is the field delim char, and field 2 the remainder of the encoding chars
-        switch (i)
+        if (!SplitHelper.TryGetPart(Value, _delimiters.FieldDelimiter, i, out var field))
         {
-            case 1:
-                return new(new[] { _delimiters.FieldDelimiter }, _delimiters);
-            case 2:
-            {
-                // field 2 is the rest of field 1
-                var encodingChars = Value[_fields[1]]; // Everything but first char
-                return new(encodingChars, _delimiters);
-            }
-            default:
-                return new(Value[_fields[i-1]], _delimiters); // all the others are offset now
+            throw new ArgumentOutOfRangeException(nameof(i), "Field index is out of range.");
         }
+
+        return new(field, _delimiters);
         
     }
 
@@ -97,28 +100,18 @@ public readonly ref struct Segment
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     private Field GetField(int index, int repeat)
     {
-        if (_fields.Length <= index || index < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index), "Field index is out of range.");
-        }
-
         if (repeat <= 0)
         {
             throw new ArgumentOutOfRangeException(nameof(repeat), "Repeat must be positive");
         }
 
-        var fieldValue = Value[_fields[index]];
-
-        Span<Range> repeats = stackalloc Range[20];
-        var repeatCount = SplitHelper.Split(fieldValue, _delimiters.RepeatDelimiter, repeats);
-        if (repeat > repeatCount)
+        var fieldValue = GetField(index).Value;
+        if (!SplitHelper.TryGetPart(fieldValue, _delimiters.RepeatDelimiter, repeat - 1, out var repeatValue))
         {
             throw new ArgumentOutOfRangeException(nameof(repeat), "Asked for repeat field doesn't have");
         }
 
-        fieldValue = fieldValue[repeats[repeat - 1]];
-
-        return new(fieldValue, _delimiters);
+        return new(repeatValue, _delimiters);
     }
 
     /// <summary>
@@ -133,15 +126,8 @@ public readonly ref struct Segment
         }
 
 
-        Span<Range> queryParts = stackalloc Range[10];
-        var queryPartsCount = SplitHelper.Split(query, '.', queryParts);
-
-        if (queryPartsCount == 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(query), "Query should have at least one part");
-        }
-
-        var fieldQuery = query[queryParts[0]];
+        var separatorIndex = query.IndexOf('.');
+        var fieldQuery = separatorIndex < 0 ? query : query[..separatorIndex];
 
         // first part has to be the field index (possibly with a repeat index??) 
         var repeatIndex = -1;
@@ -150,7 +136,7 @@ public readonly ref struct Segment
         if (parenIndex >= 0)
         {
             // we have a request for a repeat.
-            if (!SplitHelper.TryGetIntBetweenParens(fieldQuery, out repeatIndex))
+            if (!SplitHelper.TryGetIntBetweenParens(fieldQuery, out repeatIndex) || repeatIndex <= 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(query),
                     "Invalid field query format. Expected format is 'FIELD_INDEX' or 'FIELD_INDEX(repeat)'.");
@@ -174,10 +160,9 @@ public readonly ref struct Segment
         // If requested a repeat you just get that.  If you asked for the whole field, well there ya go
         var field = repeatIndex > 0 ? GetField(fieldIndex, repeatIndex) : GetField(fieldIndex);
 
-        return queryPartsCount > 1
-            ?
+        return separatorIndex >= 0
             // Defer to the field's Query method for the rest of the query
-            field.Query(query[queryParts[1].Start..])
+            ? field.Query(query[(separatorIndex + 1)..])
             : field.Value;
     }
 }
