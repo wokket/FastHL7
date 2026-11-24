@@ -3,6 +3,7 @@
     <Project Path="samples/SocketReader/SocketReader.csproj" />
   </Folder>
   <Folder Name="/SolutionItems/">
+    <File Path="../AGENTS.md" />
     <File Path="../global.json" />
     <File Path="../readme.md" />
     <File Path=".editorconfig" />
