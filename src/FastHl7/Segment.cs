@@ -95,7 +95,7 @@ public readonly ref struct Segment
     /// <param name="repeat">1-based index</param>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    internal Field GetField(int index, int repeat)
+    private Field GetField(int index, int repeat)
     {
         if (_fields.Length <= index || index < 0)
         {
