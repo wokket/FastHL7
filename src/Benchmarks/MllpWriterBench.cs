@@ -4,7 +4,7 @@ using FastHl7;
 namespace Benchmarks;
 
 [MemoryDiagnoser]
-[ShortRunJob]
+[Config(typeof(RuntimeAsyncConfig))]
 public class MllpWriterBench
 {
     
@@ -18,7 +18,7 @@ public class MllpWriterBench
  
     private readonly MemoryStream _memStream = new();
     private readonly MllpWriter _writer;
-    private readonly string _message = File.ReadAllText("Sample-ORM.txt");
+    private readonly string _message = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Sample-ORM.txt"));
    
     public  MllpWriterBench()
     {

@@ -7,6 +7,7 @@
     <File Path="../readme.md" />
     <File Path=".editorconfig" />
     <File Path="CodeCoverage.runsettings" />
+    <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
   </Folder>
   <Folder Name="/SolutionItems/.github/">

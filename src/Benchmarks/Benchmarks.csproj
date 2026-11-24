@@ -2,9 +2,14 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-        <TargetFrameworks>net9.0;net10.0</TargetFrameworks>
+        <NoWarn>SYSLIB5007</NoWarn>
+        <ServerGarbageCollection>true</ServerGarbageCollection>
+        <SystemPackageVersion Condition="'$(TargetFramework)' == 'net10.0'">10.0.12</SystemPackageVersion>
+        <SystemPackageVersion Condition="'$(TargetFramework)' == 'net11.0'">11.0.100</SystemPackageVersion>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(TargetFramework)' == 'net11.0' and '$(UseRuntimeAsync)' != 'false'">
+        <Features>runtime-async=on</Features>
     </PropertyGroup>
 
     <ItemGroup>

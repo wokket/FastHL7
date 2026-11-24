@@ -54,6 +54,9 @@ public readonly struct Delimiters
     public char FieldDelimiter { get; }
 }
 
+/// <summary>
+/// 
+/// </summary>
 public static class DelimiterExtensions
 {
     /// <summary>

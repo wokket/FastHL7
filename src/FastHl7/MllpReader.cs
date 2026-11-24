@@ -70,13 +70,14 @@ public class MllpReader : IAsyncDisposable
     public async Task ReadMessagesAsync(Func<string, Task> messageHandler,
         CancellationToken cancellationToken = default)
     {
+        await ReadMessagesAsyncInternal(LocalMessageHandler, cancellationToken);
+        return;
+
         Task LocalMessageHandler(char[] msg, int count)
         {
             var msgAsString = new String(msg.AsSpan()[..count]);
             return messageHandler(msgAsString); // asynchronous handler
         }
-
-        await ReadMessagesAsyncInternal(LocalMessageHandler, cancellationToken);
     }
 
 
@@ -94,7 +95,7 @@ public class MllpReader : IAsyncDisposable
                 {
                     if (result.IsCanceled)
                     {
-                        break; // The read was canceled. We can quit without reading the existing data.
+                        break; // The read was cancelled. We can quit without reading the existing data.
                     }
 
                     // Process all messages from the buffer, modifying the input buffer on each iteration.
