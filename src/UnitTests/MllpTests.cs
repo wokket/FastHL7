@@ -106,6 +106,35 @@ public class MllpTests
         Assert.Equal("Test Message".Length + 3, memStream.Position);
         Assert.Equal("\vTest Message\u001c\r", System.Text.Encoding.UTF8.GetString(content));
     }
+
+    [Theory]
+    [InlineData(true, 0x06)]
+    [InlineData(false, 0x15)]
+    public async Task SendSimpleAcknowledgementWritesFrame(bool ack, byte acknowledgement)
+    {
+        using var stream = new MemoryStream();
+        await using var writer = new MllpWriter(stream);
+
+        var canContinue = ack ? await writer.SendSimpleAck() : await writer.SendSimpleNak();
+
+        Assert.True(canContinue);
+        Assert.Equal(new byte[] { 0x0B, acknowledgement, 0x1C, 0x0D }, stream.ToArray());
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task SendSimpleAcknowledgementReturnsFalseWhenReaderCompleted(bool ack)
+    {
+        var pipe = new Pipe();
+        await pipe.Reader.CompleteAsync();
+        await using var writer = new MllpWriter(pipe.Writer);
+
+        var canContinue = ack ? await writer.SendSimpleAck() : await writer.SendSimpleNak();
+
+        Assert.False(canContinue);
+        await pipe.Writer.CompleteAsync();
+    }
     
     [Fact]
     public async Task ReadAndWriteSimple()

@@ -83,7 +83,7 @@ public class MllpWriter : IAsyncDisposable
     /// <returns></returns>
     public async Task<bool> SendSimpleNak()
     {
-        var result = await _writer.WriteAsync(_simpleAck);
+        var result = await _writer.WriteAsync(_simpleNak);
         return !result.IsCompleted;
     }
 
