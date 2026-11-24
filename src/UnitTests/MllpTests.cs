@@ -51,6 +51,108 @@ public class MllpTests
         Assert.Equal("Test Message", results[0]);
         Assert.Equal("Another Message", results[1]);
     }
+
+    [Fact]
+    public async Task ReadMessagesAcceptsPayloadAtConfiguredLimit()
+    {
+        var reader = new MllpReader(new MemoryStream(CreateFrame("12345"u8.ToArray())), 5);
+        var results = new List<string>();
+
+        await reader.ReadMessagesAsync(message =>
+        {
+            results.Add(message);
+            return Task.CompletedTask;
+        }, TestContext.Current.CancellationToken);
+
+        Assert.Equal("12345", Assert.Single(results));
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task ReadMessagesRejectsPayloadAboveConfiguredLimit(bool usePipeReader)
+    {
+        var bytes = CreateFrame("123456"u8.ToArray());
+        var reader = await CreateReader(usePipeReader, bytes, 5);
+        var handlerCalled = false;
+
+        await Assert.ThrowsAsync<System.Net.ProtocolViolationException>(() => reader.ReadMessagesAsync(_ =>
+        {
+            handlerCalled = true;
+            return Task.CompletedTask;
+        }, TestContext.Current.CancellationToken));
+
+        Assert.False(handlerCalled);
+    }
+
+    [Fact]
+    public async Task ReadMessagesRejectsFragmentedUnterminatedPayloadAboveConfiguredLimit()
+    {
+        var pipe = new Pipe();
+        await pipe.Writer.WriteAsync(new byte[] { 0x0B, (byte)'1', (byte)'2', (byte)'3', (byte)'4', (byte)'5' },
+            TestContext.Current.CancellationToken);
+        var reader = new MllpReader(pipe.Reader, 5);
+        var readTask = reader.ReadMessagesAsync(_ => Task.CompletedTask, TestContext.Current.CancellationToken);
+
+        await pipe.Writer.WriteAsync(new byte[] { (byte)'6' }, TestContext.Current.CancellationToken);
+        await pipe.Writer.CompleteAsync();
+
+        await Assert.ThrowsAsync<System.Net.ProtocolViolationException>(() => readTask);
+    }
+
+    [Fact]
+    public async Task ReadMessagesRejectsPayloadBeforeSynchronousHandler()
+    {
+        var reader = new MllpReader(new MemoryStream(CreateFrame("123456"u8.ToArray())), 5);
+        var handlerCalled = false;
+
+        await Assert.ThrowsAsync<System.Net.ProtocolViolationException>(() =>
+            reader.ReadMessagesAsync((ReadOnlySpan<char> _) => handlerCalled = true,
+                TestContext.Current.CancellationToken));
+
+        Assert.False(handlerCalled);
+    }
+
+    [Fact]
+    public async Task ReadMessagesRejectsPayloadAboveDefaultLimit()
+    {
+        var payload = new byte[10 * 1024 * 1024 + 1];
+        Array.Fill(payload, (byte)'x');
+        var reader = new MllpReader(new MemoryStream(CreateFrame(payload)));
+
+        await Assert.ThrowsAsync<System.Net.ProtocolViolationException>(() =>
+            reader.ReadMessagesAsync(_ => Task.CompletedTask, TestContext.Current.CancellationToken));
+    }
+
+    [Fact]
+    public void ConstructorRejectsNegativeMaximumMessageSize()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => new MllpReader(new MemoryStream(), -1));
+    }
+
+    private static async Task<MllpReader> CreateReader(bool usePipeReader, byte[] bytes, int maxMessageSizeBytes)
+    {
+        if (!usePipeReader)
+        {
+            return new MllpReader(new MemoryStream(bytes), maxMessageSizeBytes);
+        }
+
+        var pipe = new Pipe();
+        await pipe.Writer.WriteAsync(bytes, TestContext.Current.CancellationToken);
+        await pipe.Writer.CompleteAsync();
+        return new MllpReader(pipe.Reader, maxMessageSizeBytes);
+    }
+
+    private static byte[] CreateFrame(byte[] payload)
+    {
+        var frame = new byte[1 + payload.Length + 2];
+        frame[0] = 0x0B;
+        payload.CopyTo(frame, 1);
+        frame[^2] = 0x1C;
+        frame[^1] = 0x0D;
+
+        return frame;
+    }
    
 
     [Fact]

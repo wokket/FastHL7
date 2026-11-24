@@ -12,30 +12,38 @@ public class MllpReader : IAsyncDisposable
 {
     private readonly bool _ourOwnPipeReader;
     private readonly PipeReader _reader;
+    private readonly int _maxMessageSizeBytes;
 
     // MLLP framing characters
     private const byte _vt = 0x0B; // Start of message
     private const byte _fs = 0x1C; // End of message
     private const byte _cr = 0x0D; // Carriage return
+    private const int _defaultMaxMessageSizeBytes = 10 * 1024 * 1024;
 
     /// <summary>
-    /// Creates a new reader against the given stream.  The stream is not disposed by this class.
+    /// Creates a new reader against the given stream. The stream is not disposed by this class.
     /// </summary>
     /// <param name="stream"></param>
-    public MllpReader(Stream stream)
+    /// <param name="maxMessageSizeBytes">Maximum message payload size in bytes.</param>
+    public MllpReader(Stream stream, int maxMessageSizeBytes = _defaultMaxMessageSizeBytes)
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(maxMessageSizeBytes);
         _reader = PipeReader.Create(stream);
         _ourOwnPipeReader = true;
+        _maxMessageSizeBytes = maxMessageSizeBytes;
     }
 
     /// <summary>
-    /// Creates a new reader against the given PipeReader.  The PipeReader is not completed by this class.
+    /// Creates a new reader against the given PipeReader. The PipeReader is not completed by this class.
     /// </summary>
     /// <param name="pipeReader"></param>
-    public MllpReader(PipeReader pipeReader)
+    /// <param name="maxMessageSizeBytes">Maximum message payload size in bytes.</param>
+    public MllpReader(PipeReader pipeReader, int maxMessageSizeBytes = _defaultMaxMessageSizeBytes)
     {
+        ArgumentOutOfRangeException.ThrowIfNegative(maxMessageSizeBytes);
         _reader = pipeReader;
         _ourOwnPipeReader = false;
+        _maxMessageSizeBytes = maxMessageSizeBytes;
     }
 
     /// <summary>
@@ -49,14 +57,14 @@ public class MllpReader : IAsyncDisposable
     public async Task ReadMessagesAsync(Action<ReadOnlySpan<char>> messageHandler,
         CancellationToken cancellationToken = default)
     {
+        await ReadMessagesAsyncInternal(LocalMessageHandler, cancellationToken);
+        return;
+
         Task LocalMessageHandler(char[] msg, int count)
         {
             messageHandler(msg.AsSpan()[..count]); // synchronous handler
             return Task.CompletedTask;
         }
-
-
-        await ReadMessagesAsyncInternal(LocalMessageHandler, cancellationToken);
     }
 
     /// <summary>
@@ -99,7 +107,7 @@ public class MllpReader : IAsyncDisposable
                     }
 
                     // Process all messages from the buffer, modifying the input buffer on each iteration.
-                    while (TryParseMessage(ref buffer, out var messageBytes))
+                    while (TryParseMessage(ref buffer, _maxMessageSizeBytes, out var messageBytes))
                     {
                         var charBuffer =
                             ArrayPool<char>.Shared.Rent((int)messageBytes.Length); // can only be a narrowing operation
@@ -135,7 +143,8 @@ public class MllpReader : IAsyncDisposable
         }
     }
 
-    private static bool TryParseMessage(ref ReadOnlySequence<byte> buffer, out ReadOnlySequence<byte> message)
+    private static bool TryParseMessage(ref ReadOnlySequence<byte> buffer, int maxMessageSizeBytes,
+        out ReadOnlySequence<byte> message)
     {
         // Look for the header in the buffer, it should be the first char in the buffer, otherwise things are whacky
         if (buffer.IsEmpty)
@@ -153,9 +162,22 @@ public class MllpReader : IAsyncDisposable
 
         if (fsPosition == null)
         {
+            if (buffer.Length - 1 > maxMessageSizeBytes)
+            {
+                throw new ProtocolViolationException(
+                    $"MLLP message exceeds the maximum size of {maxMessageSizeBytes} bytes");
+            }
+
             // we have a partial message on the buffer, wait for more data
             message = default;
             return false;
+        }
+
+        var messageBytes = buffer.Slice(1, fsPosition.Value);
+        if (messageBytes.Length > maxMessageSizeBytes)
+        {
+            throw new ProtocolViolationException(
+                $"MLLP message exceeds the maximum size of {maxMessageSizeBytes} bytes");
         }
 
         // ensure the next char after the FS is CR
@@ -165,7 +187,7 @@ public class MllpReader : IAsyncDisposable
             throw new ProtocolViolationException("MLLP stream does not have CR character after FS");
         }
 
-        message = buffer.Slice(1, fsPosition.Value);
+        message = messageBytes;
 
         // Skip the header, message and the two-byte footer
         buffer = buffer.Slice(buffer.GetPosition(1, crPosition));
